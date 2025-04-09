@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Updated Title -->
+     <title>AI Tools Directory - The Ultimate AI Tool Directory</title>
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+         html {
+             scroll-behavior: smooth; /* Enable smooth scrolling for the whole page */
+         }
+
+         body {
+             font-family: 'Inter', sans-serif;
+             background-color: #f9fafb;
+         }
+
+         .gradient-text {
+             background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+             -webkit-background-clip: text;
+             background-clip: text;
+             color: transparent;
+         }
+
+         .card-hover:hover {
+             transform: translateY(-5px);
+             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
+         }
+
+         .feature-card {
+             transition: all 0.3s ease;
+         }
+
+         .feature-card:hover {
+             transform: translateY(-5px);
+         }
+
+         .tool-card {
+             transition: all 0.2s ease;
+         }
+
+         .tool-card:hover {
+             transform: translateY(-3px);
+             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+         }
+
+         .news-card {
+             transition: all 0.2s ease;
+         }
+
+         .news-card:hover {
+             transform: translateY(-3px);
+             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+         }
+
+         .comparison-card {
+             transition: all 0.3s ease;
+         }
+
+         .modal {
+             display: none;
+             position: fixed;
+             z-index: 1000;
+             left: 0;
+             top: 0;
+             width: 100%;
+             height: 100%;
+             overflow: auto;
+             background-color: rgba(0,0,0,0.6); /* Darker background */
+             backdrop-filter: blur(3px); /* Optional: blur background */
+             animation: fadeIn 0.3s ease;
+         }
+
+         .modal-content {
+             background-color: #fefefe;
+             margin: 10% auto; /* Adjusted margin */
+             padding: 25px; /* Increased padding */
+             border: 1px solid #ddd; /* Softer border */
+             width: 90%; /* Responsive width */
+             max-width: 500px; /* Adjusted max-width for forms */
+             border-radius: 12px; /* More rounded corners */
+             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+             animation: slideIn 0.3s ease;
+         }
+
+         .close {
+             color: #aaa;
+             float: right;
+             font-size: 32px; /* Larger close button */
+             line-height: 1;
+             font-weight: bold;
+             transition: color 0.2s ease;
+         }
+
+         .close:hover,
+         .close:focus {
+             color: #333; /* Darker hover */
+             text-decoration: none;
+             cursor: pointer;
+         }
+
+         /* Modal Animations */
+         @keyframes fadeIn {
+             from {opacity: 0;}
+             to {opacity: 1;}
+         }
+
+         @keyframes slideIn {
+             from {transform: translateY(-30px); opacity: 0;}
+             to {transform: translateY(0); opacity: 1;}
+         }
+
+         /* Active state for filter buttons */
+         .filter-button-active {
+             background-color: #4f46e5 !important; /* Use !important carefully */
+             color: white !important;
+             border-color: #4f46e5 !important;
+         }
+         .filter-button-inactive {
+             background-color: white;
+             border: 1px solid #d1d5db; /* gray-300 */
+             color: #374151; /* gray-700 */
+         }
+         .filter-button-inactive:hover {
+              background-color: #f9fafb; /* gray-50 */
+         }
+
+         /* Helper class to hide elements */
+         .hidden-item {
+             display: none !important;
+         }
+
+         /* Style for links within modal forms */
+        .modal-form-link {
+             cursor: pointer;
+             color: #4f46e5; /* indigo-600 */
+             font-weight: 500;
+        }
+        .modal-form-link:hover {
+            text-decoration: underline;
+        }.review-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.star-rating-widget {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.star-rating-widget .stars {
+    display: inline-block;
+    direction: rtl; /* Reverse order for sibling selector to work */
+    unicode-bidi: bidi-override;
+}
+
+.star-rating-widget .stars input {
+    display: none;
+}
+
+.star-rating-widget .stars label {
+    color: #ddd;
+    font-size: 36px;
+    padding: 0 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.star-rating-widget .stars label:hover,
+.star-rating-widget .stars label:hover ~ label,
+.star-rating-widget .stars input:checked ~ label {
+    color: #ffc107;
+    text-shadow: 0 0 5px rgba(255,193,7,0.5);
+}
+
+.rating-text {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    transition: border 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #3498db, #2c3e50);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(135deg, #2980b9, #1a252f);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.submit-btn i {
+    margin-right: 8px;
+}
+/* Container spacing */
+.page-section {
+  padding: 40px 0;
+  margin: 30px 0;
+}
+
+/* Form styling */
+.review-container-horizontal {
+  /* All your existing form styles */
+}
+
+     </style>
+ </head>
+ <body class="antialiased"> <!-- Added antialiased for better font rendering -->
+     <!-- Navigation -->
+     <nav class="bg-white shadow-sm sticky top-0 z-50">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="flex justify-between h-16">
+                 <div class="flex">
+                     <div class="flex-shrink-0 flex items-center">
+                         <!-- Updated Title Text -->
+                         <span class="text-2xl font-bold gradient-text">AI Tools Directory</span>
+                     </div>
+                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                         <!-- Updated links to trigger smooth scroll -->
+                         <a href="#home" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">Home</a>
+                         <a href="#tools" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">Tools</a>
+                         <a href="#comparison" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">Compare</a>
+                         <a href="#news" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">News</a>
+                         <a href="#matchmaker" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">AI Matchmaker</a>
+                     </div>
+                 </div>
+                 <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                     <div class="ml-3 relative">
+                         <button id="signInBtn" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">
+                             Sign In / Sign Up
+                         </button>
+                     </div>
+                 </div>
+                 <!-- Mobile Menu Button -->
+                 <div class="-mr-2 flex items-center sm:hidden">
+                   <button type="button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false" id="mobileMenuBtn">
+                     <span class="sr-only">Open main menu</span>
+                     <i class="fas fa-bars text-lg"></i> <!-- Hamburger icon -->
+                   </button>
+                 </div>
+             </div>
+         </div>
+          <!-- Mobile menu, show/hide based on menu state. -->
+          <div class="sm:hidden hidden" id="mobile-menu">
+             <div class="pt-2 pb-3 space-y-1">
+               <a href="#home" class="block pl-3 pr-4 py-2 border-l-4 border-indigo-500 text-base font-medium text-indigo-700 bg-indigo-50 nav-link">Home</a>
+               <a href="#tools" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 nav-link">Tools</a>
+               <a href="#comparison" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 nav-link">Compare</a>
+               <a href="#news" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 nav-link">News</a>
+               <a href="#matchmaker" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 nav-link">AI Matchmaker</a>
+             </div>
+             <div class="pt-4 pb-3 border-t border-gray-200">
+               <button id="signInBtnMobile" class="w-full text-left block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">Sign In / Sign Up</button>
+             </div>
+           </div>
+     </nav>
+
+     <!-- Hero Section -->
+     <section id="home" class="py-12 bg-white">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="lg:flex lg:items-center lg:justify-between">
+                 <div class="lg:w-1/2">
+                     <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                         <span class="block">Find the perfect</span>
+                         <span class="block gradient-text">AI tool for your needs</span>
+                     </h1>
+                     <p class="mt-3 max-w-md mx-auto text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
+                         The most comprehensive directory of AI tools with interactive comparisons, real-time news, and personalized recommendations.
+                     </p>
+                     <div class="mt-10 sm:flex">
+                         <div class="rounded-md shadow">
+                             <a href="#matchmaker" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 md:py-4 md:text-lg md:px-10 nav-link">
+                                 Find Your AI Tool
+                             </a>
+                         </div>
+                         <div class="mt-3 sm:mt-0 sm:ml-3">
+                             <a href="#tools" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 nav-link">
+                                 Browse Directory
+                             </a>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="mt-10 lg:mt-0 lg:w-1/2">
+                     <div class="relative">
+                         <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-indigo-100 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+                         <div class="relative bg-white p-6 sm:p-10 shadow-xl rounded-3xl">
+                             <div class="flex items-center justify-between mb-8">
+                                 <div>
+                                     <h2 class="text-xl font-bold text-gray-900">Top Trending AI Tools</h2>
+                                     <p class="text-sm text-gray-500">Updated hourly</p>
+                                 </div>
+                                 <div>
+                                     <!-- Added ID for JS interaction -->
+                                     <select id="heroCategorySelect" class="text-sm text-gray-500 border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                         <option>All Categories</option>
+                                         <option>Text Generation</option>
+                                         <option>Image Generation</option>
+                                         <option>Code Assistants</option>
+                                         <!-- Added New Category -->
+                                         <option>Audio & Music</option>
+                                     </select>
+                                 </div>
+                             </div>
+                             <div class="space-y-4">
+                                 <!-- Static trending tools list -->
+                                 <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50 tool-card">
+                                     <div class="flex items-center">
+                                         <div class="bg-blue-100 rounded-md p-2 mr-4"> <i class="fas fa-robot text-blue-500"></i> </div>
+                                         <div> <h3 class="font-medium">Claude 3.7 Sonnet</h3> <p class="text-sm text-gray-500">Text & Reasoning</p> </div>
+                                     </div>
+                                     <div class="flex items-center"> <div class="text-sm font-medium text-gray-900 mr-2">4.9</div> <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i> </div> </div>
+                                 </div>
+                                 <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50 tool-card">
+                                     <div class="flex items-center"> <div class="bg-purple-100 rounded-md p-2 mr-4"> <i class="fas fa-palette text-purple-500"></i> </div> <div> <h3 class="font-medium">Midjourney v6.5</h3> <p class="text-sm text-gray-500">Image Generation</p> </div> </div>
+                                     <div class="flex items-center"> <div class="text-sm font-medium text-gray-900 mr-2">4.8</div> <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star-half-alt text-yellow-400"></i> </div> </div>
+                                 </div>
+                                 <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50 tool-card">
+                                     <div class="flex items-center"> <div class="bg-green-100 rounded-md p-2 mr-4"> <i class="fas fa-code text-green-500"></i> </div> <div> <h3 class="font-medium">GitHub Copilot</h3> <p class="text-sm text-gray-500">Code Assistant</p> </div> </div>
+                                     <div class="flex items-center"> <div class="text-sm font-medium text-gray-900 mr-2">4.7</div> <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star-half-alt text-yellow-400"></i> </div> </div>
+                                 </div>
+                                 <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50 tool-card">
+                                     <!-- Updated Trending Tool Example -->
+                                     <div class="flex items-center"> <div class="bg-yellow-100 rounded-md p-2 mr-4"> <i class="fas fa-music text-yellow-600"></i> </div> <div> <h3 class="font-medium">Suno AI</h3> <p class="text-sm text-gray-500">Music Generation</p> </div> </div>
+                                     <div class="flex items-center"> <div class="text-sm font-medium text-gray-900 mr-2">4.6</div> <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star-half-alt text-yellow-400"></i> </div> </div>
+                                 </div>
+                             </div>
+                             <div class="mt-6 text-center">
+                                 <a href="#tools" class="text-indigo-600 hover:text-indigo-500 text-sm font-medium nav-link">
+                                     View all tools <i class="fas fa-arrow-right ml-1"></i>
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </section>
+
+     <!-- Stats Section -->
+     <section class="bg-indigo-800 py-10">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="grid grid-cols-2 gap-4 md:grid-cols-4 text-center">
+                 <!-- Updated Stat - Increased Tool Count -->
+                 <div class="bg-indigo-700 rounded-lg p-6">
+                     <div class="text-4xl font-bold text-white" data-target="1250">0+</div>
+                     <div class="text-indigo-200 mt-1">AI Tools</div>
+                 </div>
+                  <!-- Updated Stat - Increased Category Count -->
+                 <div class="bg-indigo-700 rounded-lg p-6">
+                     <div class="text-4xl font-bold text-white" data-target="40">0+</div>
+                     <div class="text-indigo-200 mt-1">Categories</div>
+                 </div>
+                 <div class="bg-indigo-700 rounded-lg p-6">
+                     <div class="text-4xl font-bold text-white" data-target="25000">0+</div>
+                     <div class="text-indigo-200 mt-1">User Reviews</div>
+                 </div>
+                 <div class="bg-indigo-700 rounded-lg p-6">
+                     <div class="text-4xl font-bold text-white">Daily</div> <!-- Non-numeric stat -->
+                     <div class="text-indigo-200 mt-1">Updates</div>
+                 </div>
+             </div>
+         </div>
+     </section>
+
+     <!-- Features Section -->
+     <section class="py-12 bg-gray-50">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="text-center">
+                 <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl"> Features that set us apart </h2>
+                 <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500"> Discover AI tools like never before with our unique interactive features. </p>
+             </div>
+             <div class="mt-10">
+                 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-blue-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-exchange-alt text-blue-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Dynamic Comparisons</h3> <p class="mt-2 text-gray-500"> Compare up to 4 AI tools side-by-side with interactive feature matrices and visual differentiators. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-purple-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-user-check text-purple-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">AI Matchmaker Quiz</h3> <p class="mt-2 text-gray-500"> Find your perfect AI tool match through our interactive questionnaire based on your needs and skills. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-green-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-newspaper text-green-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Real-time AI News</h3> <p class="mt-2 text-gray-500"> Stay updated with curated news about AI advancements, new releases, and industry trends. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-yellow-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-chart-line text-yellow-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Performance Benchmarks</h3> <p class="mt-2 text-gray-500"> View standardized comparison metrics for similar AI models to understand performance differences. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-red-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-tasks text-red-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Use Case Scenarios</h3> <p class="mt-2 text-gray-500"> Interactive demos showing how different tools solve common problems in various industries. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-indigo-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-calendar-alt text-indigo-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Release Calendar</h3> <p class="mt-2 text-gray-500"> Track upcoming AI tool releases and beta access opportunities all in one place. </p> </div>
+                 </div>
+             </div>
+         </div>
+     </section>
+
+     <!-- Tools Directory Section -->
+     <section id="tools" class="py-12 bg-white">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-8"> AI Tools Directory </h2>
+             <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+                 <!-- Added ID to container for easier selection -->
+                 <div class="flex flex-wrap gap-2" id="toolFilterButtons">
+                      <!-- Added data-filter attribute -->
+                     <button data-filter="all" class="filter-button-active px-4 py-2 rounded-md text-sm font-medium">All</button>
+                     <button data-filter="text ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Text Generation</button>
+                     <button data-filter="image ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Image Generation</button>
+                     <button data-filter="code ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Code Assistants</button>
+                     <button data-filter="video ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Video Generation</button>
+                     <button data-filter="audio ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Audio & Music</button>
+                     <!-- Added new filter button -->
+                     <button data-filter="utility ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Utility & Other</button>
+                 </div>
+                 <div class="flex items-center flex-wrap gap-4"> <!-- Added flex-wrap and gap -->
+                     <div class="relative">
+                         <input type="text" id="toolSearchInput" placeholder="Search tools..." class="border border-gray-300 rounded-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                         <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                     </div>
+                     <div class="ml-0 sm:ml-4 relative"> <!-- Adjusted margin for wrapping & relative for icon -->
+                         <select id="toolSortSelect" class="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none pr-8"> <!-- Added appearance-none and pr-8 -->
+                             <option value="popularity">Sort by: Popularity</option>
+                             <option value="rating">Sort by: Rating</option>
+                             <option value="newest">Sort by: Newest</option>
+                             <option value="price_asc">Sort by: Price (Low to High)</option>
+                         </select>
+                          <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i> <!-- Icon for select -->
+                     </div>
+                 </div>
+             </div>
+
+             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" id="toolsGrid">
+                 <!-- Tool 1: Claude -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="text ai" data-rating="4.9" data-date="2025-04-05">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-robot text-blue-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">Claude 3.7 Sonnet</h3> <p class="text-sm text-gray-500">Anthropic</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Text AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> Advanced AI assistant with superior reasoning capabilities, ideal for complex tasks, research, and creative writing. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.9</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">352 reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="20">Free - $20/mo</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Reasoning</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Code</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Creative</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Research</span> </div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="Claude 3.7 Sonnet">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="Claude 3.7 Sonnet">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Tool 2: Midjourney -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="image ai" data-rating="4.8" data-date="2025-03-15">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-palette text-purple-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">Midjourney v6.5</h3> <p class="text-sm text-gray-500">Midjourney</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Image AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> State-of-the-art AI image generator capable of creating stunning, artistic images from text descriptions via Discord. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.8</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">298 reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="10" data-price-high="60">$10 - $60/mo</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Art</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Design</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Photorealistic</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Discord</span></div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="Midjourney v6.5">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="Midjourney v6.5">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Tool 3: GitHub Copilot -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="code ai" data-rating="4.7" data-date="2025-02-20">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-code text-green-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">GitHub Copilot</h3> <p class="text-sm text-gray-500">GitHub</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Code AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> AI pair programmer that helps you write code faster with smart autocomplete and full line & function suggestions. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.7</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">412 reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="10">Free (Students) - $10/mo</span> </div> <!-- Updated price text slightly -->
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Coding</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Developer</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">IDE</span> </div>
+                         <div class="flex justify-between">
+                              <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="GitHub Copilot">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="GitHub Copilot">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Tool 4: RunwayML -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="video ai" data-rating="4.6" data-date="2025-01-10">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="h-10 w-10 bg-red-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-video text-red-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">RunwayML</h3> <p class="text-sm text-gray-500">Runway</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Video AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> AI-powered video editing and generation suite for creators, featuring text-to-video (Gen-2) and other magic tools. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.6</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">150 reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="35">Free - $35+/mo</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Video Editing</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Gen-2</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Creative Suite</span> </div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="RunwayML">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="RunwayML">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- NEW Tool 5: ChatGPT 3.5 -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="text ai" data-rating="4.7" data-date="2025-03-25">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <!-- Using a comment icon for ChatGPT -->
+                                 <div class="h-10 w-10 bg-teal-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-comment-dots text-teal-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">ChatGPT (3.5)</h3> <p class="text-sm text-gray-500">OpenAI</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Text AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> Highly popular conversational AI for generating text, answering questions, writing code, brainstorming, and more. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.7</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">1000+ reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="20">Free (GPT-3.5) / $20/mo (GPT-4)</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Chatbot</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Writing</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Conversation</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">General Purpose</span> </div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="ChatGPT (3.5)">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="ChatGPT (3.5)">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- NEW Tool 6: Google Gemini -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="text ai" data-rating="4.6" data-date="2025-03-20">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <!-- Using brain icon for Gemini -->
+                                 <div class="h-10 w-10 bg-rose-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-brain text-rose-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">Google Gemini</h3> <p class="text-sm text-gray-500">Google</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Text AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> Google's powerful AI model for conversation, content creation, and multimodal understanding (text, images, code). </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.6</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">650+ reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="20">Free / $20/mo (Advanced)</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Chatbot</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Multimodal</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Google Ecosystem</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Research</span></div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="Google Gemini">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="Google Gemini">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- NEW Tool 7: Leonardo.Ai -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="image ai" data-rating="4.7" data-date="2025-04-01">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <!-- Using image icon -->
+                                 <div class="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-image text-orange-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">Leonardo.Ai</h3> <p class="text-sm text-gray-500">Leonardo</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Image AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> Feature-rich platform for creating stunning AI art and images using various models (incl. Stable Diffusion) with a generous free tier. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.7</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">420 reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="12">Free (Daily Credits) - $12+/mo</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Image Generation</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Art</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Stable Diffusion</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Web UI</span></div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="Leonardo.Ai">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="Leonardo.Ai">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- NEW Tool 8: Suno AI -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="audio ai" data-rating="4.6" data-date="2025-03-18">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <!-- Music icon -->
+                                 <div class="h-10 w-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-music text-yellow-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">Suno AI</h3> <p class="text-sm text-gray-500">Suno</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Audio AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> Generate original songs with vocals and instrumentation simply by providing text prompts for lyrics and style. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.6</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">250 reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="10">Free (Daily Credits) - $10+/mo</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Music Generation</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Song Creation</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Vocals</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Text-to-Music</span></div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="Suno AI">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="Suno AI">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                  <!-- NEW Tool 9: Grammarly -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="utility ai" data-rating="4.8" data-date="2024-12-01"> <!-- Older date example -->
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <!-- Spell check icon -->
+                                 <div class="h-10 w-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-spell-check text-emerald-600"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">Grammarly</h3> <p class="text-sm text-gray-500">Grammarly, Inc.</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Utility AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> AI-powered writing assistant that checks grammar, spelling, punctuation, clarity, engagement, and delivery tones. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.8</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">2000+ reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="12">Free - $12+/mo (Premium)</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Writing Assistant</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Grammar</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Clarity</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Browser Extension</span></div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="Grammarly">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="Grammarly">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- NEW Tool 10: Phind -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card" data-category="code ai" data-rating="4.5" data-date="2025-02-15">
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <!-- Terminal icon -->
+                                 <div class="h-10 w-10 bg-gray-200 rounded-lg flex items-center justify-center mr-3"> <i class="fas fa-terminal text-gray-700"></i> </div>
+                                 <div> <h3 class="text-lg font-semibold text-gray-900">Phind</h3> <p class="text-sm text-gray-500">Phind Inc.</p> </div>
+                             </div>
+                             <div class="flex items-center"> <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">Code AI</span> </div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> AI search engine designed specifically for developers, providing code examples and explanations sourced from the web. </p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center">
+                                 <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i> <span class="ml-1 text-gray-600 text-sm tool-rating">4.5</span> </div>
+                                 <span class="mx-2 text-gray-300">|</span>
+                                 <div class="flex items-center"> <i class="fas fa-comment text-gray-400"></i> <span class="ml-1 text-gray-600 text-sm">180 reviews</span> </div>
+                             </div>
+                             <div> <span class="text-sm font-medium text-gray-700 tool-price" data-price-low="0" data-price-high="20">Free / $20/mo (Plus)</span> </div>
+                         </div>
+                         <div class="flex flex-wrap gap-2 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Developer Search</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Code Examples</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Debugging</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">Pair Programming</span></div>
+                         <div class="flex justify-between">
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="Phind">View Details</a>
+                             <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="Phind">Try Now</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Existing 'Load More' logic will handle dynamically added tools -->
+
+             </div>
+
+             <div class="mt-8 text-center">
+                 <button id="loadMoreTools" class="px-6 py-3 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">
+                     Load More Tools <i class="fas fa-chevron-down ml-2"></i>
+                 </button>
+                  <p id="no-more-tools" class="text-gray-500 mt-4 hidden">No more tools to load.</p>
+             </div>
+         </div>
+     </section>
+
+     <!-- Comparison Tool Section -->
+     <section id="comparison" class="py-12 bg-gray-50">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-8"> Compare AI Tools </h2>
+             <p class="text-xl text-gray-500 mb-10 max-w-3xl"> Make an informed decision by comparing features, pricing, and performance of different AI tools side by side. </p>
+             <div class="bg-white shadow rounded-lg overflow-hidden">
+                 <div class="p-6">
+                     <div class="mb-6">
+                         <h3 class="text-lg font-medium text-gray-900 mb-4">Select tools to compare (up to 4)</h3>
+                         <!-- Added class 'compare-select' to selects -->
+                         <div class="flex flex-wrap gap-4 items-center">
+                             <div class="relative">
+                                 <select class="compare-select border border-gray-300 rounded-lg px-4 py-2 w-64 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                     <option value="">Select AI Tool 1</option>
+                                     <option value="Claude 3.7 Sonnet">Claude 3.7 Sonnet</option>
+                                     <option value="Midjourney v6.5">Midjourney v6.5</option>
+                                     <option value="GitHub Copilot">GitHub Copilot</option>
+                                     <option value="RunwayML">RunwayML</option>
+                                     <!-- Add New Tools Here -->
+                                     <option value="ChatGPT (3.5)">ChatGPT (3.5)</option> <!-- Match name exactly -->
+                                     <option value="Google Gemini">Google Gemini</option>
+                                     <option value="Leonardo.Ai">Leonardo.Ai</option>
+                                     <option value="Suno AI">Suno AI</option>
+                                     <option value="Grammarly">Grammarly</option>
+                                     <option value="Phind">Phind</option>
+                                 </select>
+                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                             </div>
+                             <div class="relative">
+                                 <select class="compare-select border border-gray-300 rounded-lg px-4 py-2 w-64 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                      <option value="">Select AI Tool 2</option>
+                                      <option value="Claude 3.7 Sonnet">Claude 3.7 Sonnet</option>
+                                      <option value="Midjourney v6.5">Midjourney v6.5</option>
+                                      <option value="GitHub Copilot">GitHub Copilot</option>
+                                      <option value="RunwayML">RunwayML</option>
+                                      <!-- Add New Tools Here -->
+                                      <option value="ChatGPT (3.5)">ChatGPT (3.5)</option>
+                                      <option value="Google Gemini">Google Gemini</option>
+                                      <option value="Leonardo.Ai">Leonardo.Ai</option>
+                                      <option value="Suno AI">Suno AI</option>
+                                      <option value="Grammarly">Grammarly</option>
+                                      <option value="Phind">Phind</option>
+                                 </select>
+                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                             </div>
+                             <div class="relative">
+                                 <select class="compare-select border border-gray-300 rounded-lg px-4 py-2 w-64 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                      <option value="">Select AI Tool 3 (Optional)</option>
+                                      <option value="Claude 3.7 Sonnet">Claude 3.7 Sonnet</option>
+                                      <option value="Midjourney v6.5">Midjourney v6.5</option>
+                                      <option value="GitHub Copilot">GitHub Copilot</option>
+                                      <option value="RunwayML">RunwayML</option>
+                                     <!-- Add New Tools Here -->
+                                      <option value="ChatGPT (3.5)">ChatGPT (3.5)</option>
+                                      <option value="Google Gemini">Google Gemini</option>
+                                      <option value="Leonardo.Ai">Leonardo.Ai</option>
+                                      <option value="Suno AI">Suno AI</option>
+                                      <option value="Grammarly">Grammarly</option>
+                                      <option value="Phind">Phind</option>
+                                 </select>
+                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                             </div>
+                              <div class="relative">
+                                 <select class="compare-select border border-gray-300 rounded-lg px-4 py-2 w-64 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                      <option value="">Select AI Tool 4 (Optional)</option>
+                                      <option value="Claude 3.7 Sonnet">Claude 3.7 Sonnet</option>
+                                      <option value="Midjourney v6.5">Midjourney v6.5</option>
+                                      <option value="GitHub Copilot">GitHub Copilot</option>
+                                      <option value="RunwayML">RunwayML</option>
+                                      <!-- Add New Tools Here -->
+                                      <option value="ChatGPT (3.5)">ChatGPT (3.5)</option>
+                                      <option value="Google Gemini">Google Gemini</option>
+                                      <option value="Leonardo.Ai">Leonardo.Ai</option>
+                                      <option value="Suno AI">Suno AI</option>
+                                      <option value="Grammarly">Grammarly</option>
+                                      <option value="Phind">Phind</option>
+                                 </select>
+                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                             </div>
+                             <button id="compareBtn" class="bg-indigo-600 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"> Compare </button>
+                         </div>
+                     </div>
+
+                     <!-- Placeholder for comparison results -->
+                     <div id="comparisonResults" class="hidden">
+                         <div class="overflow-x-auto mb-10">
+                             <table class="min-w-full divide-y divide-gray-200" id="comparisonTable">
+                                 <thead class="bg-gray-50">
+                                     <!-- Headers will be generated by JS -->
+                                     <tr>
+                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10"> Features </th>
+                                     </tr>
+                                 </thead>
+                                 <tbody class="bg-white divide-y divide-gray-200">
+                                     <!-- Rows will be generated by JS -->
+                                 </tbody>
+                             </table>
+                         </div>
+
+                         <div class="mt-10">
+                             <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Benchmark</h3>
+                             <div class="w-full h-80 bg-white rounded-lg p-4 border border-gray-200">
+                                 <canvas id="performanceChart"></canvas>
+                             </div>
+                         </div>
+                     </div>
+                      <p id="comparisonPlaceholder" class="text-gray-500 text-center py-10">Select at least two tools and click 'Compare' to see results.</p>
+
+                 </div>
+             </div>
+         </div>
+     </section>
+
+     <!-- AI News Section -->
+     <section id="news" class="py-12 bg-white">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-6"> AI News & Updates </h2>
+             <p class="text-xl text-gray-500 mb-10 max-w-3xl"> Stay informed with the latest AI advancements, tool releases, and industry trends. </p>
+             <div class="mb-8">
+                 <div class="flex flex-wrap items-center justify-between gap-4">
+                     <!-- Added ID to container -->
+                     <div class="flex flex-wrap gap-2" id="newsFilterButtons">
+                         <!-- Added data-filter -->
+                         <button data-filter="all" class="filter-button-active px-4 py-2 rounded-md text-sm font-medium">All News</button>
+                         <button data-filter="release" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Release Updates</button>
+                         <button data-filter="trend" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Industry Trends</button>
+                         <button data-filter="research" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Research Papers</button>
+                     </div>
+                     <div class="relative"> <!-- Added relative positioning for icon -->
+                         <select id="newsSortSelect" class="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none pr-8"> <!-- Added appearance-none and pr-8 -->
+                             <option value="latest">Sort by: Latest</option>
+                             <option value="most_read">Sort by: Most Read</option>
+                             <option value="featured">Sort by: Featured</option>
+                         </select>
+                         <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i> <!-- Icon for select -->
+                     </div>
+                 </div>
+             </div>
+
+             <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3" id="newsGrid">
+                 <!-- News 1 -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden news-card" data-category="release" data-date="2025-04-05">
+                     <div class="h-48 bg-gray-200 relative">
+                         <img src="https://images.unsplash.com/photo-1677756119517-756a188d2d94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDEwfHxhaSUyMGxhdW5jaHxlbnwwfDB8fHwxNjgzNTU5ODUz&ixlib=rb-4.0.3&q=80&w=400" alt="AI Release News" class="absolute inset-0 w-full h-full object-cover"> <!-- Real Unsplash Image -->
+                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-50"></div>
+                         <div class="absolute top-4 left-4"> <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded news-category-tag">New Release</span> </div>
+                     </div>
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-2"> <span class="text-sm text-gray-500 news-date">April 5, 2025</span> <span class="text-sm text-gray-500">5 min read</span> </div>
+                         <h3 class="text-xl font-bold text-gray-900 mb-2">Anthropic Releases Claude 3.7 Sonnet</h3>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> Anthropic introduces a new version of Claude with improved reasoning capabilities, vision, and performance. </p>
+                         <div class="flex items-center justify-between">
+                             <div class="flex items-center">
+                                 <img src="https://via.placeholder.com/32/CBD5E0/FFFFFF?text=AC" alt="Author" class="h-8 w-8 rounded-full mr-2"> <!-- Placeholder Avatar -->
+                                 <!-- Updated Title -->
+                                 <span class="text-sm text-gray-600">AI Tools Directory Staff</span>
+                             </div>
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm read-more" data-news="claude">Read More</a>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- News 2 -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden news-card" data-category="trend" data-date="2025-04-03">
+                      <div class="h-48 bg-gray-200 relative">
+                         <img src="https://images.unsplash.com/photo-1682002115004-91d79b809a17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDE1fHxhSSUyMHZpZGVvfGVufDB8MHx8fDE2ODM1NjAwMTk&ixlib=rb-4.0.3&q=80&w=400" alt="AI Video Trends" class="absolute inset-0 w-full h-full object-cover"> <!-- Real Unsplash Image -->
+                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-50"></div>
+                         <div class="absolute top-4 left-4"> <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded news-category-tag">Industry Trend</span> </div>
+                     </div>
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-2"> <span class="text-sm text-gray-500 news-date">April 3, 2025</span> <span class="text-sm text-gray-500">8 min read</span> </div>
+                         <h3 class="text-xl font-bold text-gray-900 mb-2">AI Video Tools Growth Explodes</h3>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> New report shows 300% growth in AI video tool adoption across creative industries. </p>
+                         <div class="flex items-center justify-between">
+                             <div class="flex items-center">
+                                 <img src="https://via.placeholder.com/32/FBCFE8/FFFFFF?text=MJ" alt="Author" class="h-8 w-8 rounded-full mr-2"> <!-- Placeholder Avatar -->
+                                 <span class="text-sm text-gray-600">Maya Johnson</span>
+                             </div>
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm read-more" data-news="video">Read More</a>
+                         </div>
+                     </div>
+                 </div>
+
+                  <!-- News 3 (Example - Research) -->
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden news-card" data-category="research" data-date="2025-04-01">
+                      <div class="h-48 bg-gray-200 relative">
+                         <img src="https://images.unsplash.com/photo-1532187863486-abf9db5a9fed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDZ8fGFpJTIwcmVzZWFyY2h8ZW58MHwwfHx8MTY4MzU2MDEyOA&ixlib=rb-4.0.3&q=80&w=400" alt="AI Research News" class="absolute inset-0 w-full h-full object-cover"> <!-- Real Unsplash Image -->
+                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-50"></div>
+                         <div class="absolute top-4 left-4"> <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded news-category-tag">Research Paper</span> </div>
+                     </div>
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-2"> <span class="text-sm text-gray-500 news-date">April 1, 2025</span> <span class="text-sm text-gray-500">12 min read</span> </div>
+                         <h3 class="text-xl font-bold text-gray-900 mb-2">Breakthrough in Efficient Transformers</h3>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3"> A new paper details a method to significantly reduce the computational cost of large language models. </p>
+                         <div class="flex items-center justify-between">
+                             <div class="flex items-center">
+                                <img src="https://via.placeholder.com/32/A5F3FC/FFFFFF?text=DrL" alt="Author" class="h-8 w-8 rounded-full mr-2"> <!-- Placeholder Avatar -->
+                                 <span class="text-sm text-gray-600">Dr. Evelyn Reed</span>
+                             </div>
+                             <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm read-more" data-news="research">Read More</a>
+                         </div>
+                     </div>
+                 </div>
+                 <!-- Add more news items here if needed -->
+             </div>
+             <div class="mt-8 text-center">
+                 <button id="loadMoreNews" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors hidden"> <!-- Initially hidden -->
+                     Load More News <i class="fas fa-chevron-down ml-2"></i>
+                 </button>
+                 <p id="no-more-news" class="text-gray-500 mt-4 hidden">No more news articles to load.</p>
+             </div>
+         </div>
+     </section>
+
+     <!-- AI Matchmaker Section -->
+     <section id="matchmaker" class="py-12 bg-gray-50">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-8"> AI Matchmaker Quiz </h2>
+             <p class="text-xl text-gray-500 mb-10 max-w-3xl"> Answer a few questions to find the perfect AI tool for your needs. </p>
+             <div class="bg-white shadow rounded-lg p-6 sm:p-8"> <!-- Increased padding -->
+                 <form id="matchmakerForm">
+                     <div class="mb-6">
+                         <label for="useCaseSelect" class="block text-lg font-medium text-gray-900 mb-2">What’s your primary use case?</label>
+                         <div class="relative">
+                              <select id="useCaseSelect" class="border border-gray-300 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none"> <!-- Increased padding -->
+                                 <option value="">Select an option</option>
+                                 <option value="Text Generation">Text Generation (Writing, Summarizing)</option>
+                                 <option value="Image Creation">Image Creation (Art, Design)</option>
+                                 <option value="Coding Assistance">Coding Assistance (Development)</option>
+                                 <option value="Video Generation">Video Generation/Editing</option>
+                                 <option value="Audio Creation">Audio & Music Creation</option>
+                                 <!-- Added Option -->
+                                 <option value="Writing Improvement">Writing Improvement (Grammar, Style)</option>
+                             </select>
+                             <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
+                         </div>
+                     </div>
+                     <div class="mb-6">
+                         <label for="budgetSelect" class="block text-lg font-medium text-gray-900 mb-2">What’s your budget?</label>
+                          <div class="relative">
+                             <select id="budgetSelect" class="border border-gray-300 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none"> <!-- Increased padding -->
+                                 <option value="">Select an option</option>
+                                 <option value="Free">Free Tools Only</option>
+                                 <option value="Low">Up to $20/month</option>
+                                 <option value="Mid">$20 - $50/month</option>
+                                 <option value="High">$50+/month or Enterprise</option>
+                             </select>
+                             <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
+                         </div>
+                     </div>
+                      <div class="mb-8"> <!-- Added more spacing -->
+                         <label for="skillLevelSelect" class="block text-lg font-medium text-gray-900 mb-2">What's your technical skill level?</label>
+                          <div class="relative">
+                             <select id="skillLevelSelect" class="border border-gray-300 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none"> <!-- Increased padding -->
+                                 <option value="">Select an option</option>
+                                 <option value="Beginner">Beginner (Easy to use interface preferred)</option>
+                                 <option value="Intermediate">Intermediate (Comfortable with some options)</option>
+                                 <option value="Advanced">Advanced (Need power features/API access)</option>
+                             </select>
+                             <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
+                         </div>
+                     </div>
+                     <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-md text-base font-medium hover:opacity-90 transition-opacity">
+                         <i class="fas fa-magic mr-2"></i> Find My Match
+                     </button>
+                 </form>
+             </div>
+         </div><br><br>
+
+     <div class="review-container">
+        <form id="reviewForm" class="review-form">
+            <h4 class="form-title">Rate this AI tool</h4>
+            
+            <div class="star-rating-widget">
+                <div class="stars">
+                    <input type="radio" name="rating" id="rating-5" value="5" required>
+                    <label for="rating-5" class="star" title="Excellent">★</label>
+                    
+                    <input type="radio" name="rating" id="rating-4" value="4">
+                    <label for="rating-4" class="star" title="Good">★</label>
+                    
+                    <input type="radio" name="rating" id="rating-3" value="3">
+                    <label for="rating-3" class="star" title="Average">★</label>
+                    
+                    <input type="radio" name="rating" id="rating-2" value="2">
+                    <label for="rating-2" class="star" title="Poor">★</label>
+                    
+                    <input type="radio" name="rating" id="rating-1" value="1">
+                    <label for="rating-1" class="star" title="Terrible">★</label>
+                </div>
+                <div class="rating-text" id="rating-text">Select rating</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="review-title">Review Title</label>
+                <input type="text" id="review-title" name="title" placeholder="Brief summary of your experience" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="review-content">Your Review</label>
+                <textarea id="review-content" name="content" rows="4" placeholder="Share your detailed experience with this tool..." required></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane"></i> Submit Review
+            </button>
+        </form>
+    </div>
+</section>
+
+      <!-- Footer -->
+     <footer class="bg-gray-800 text-gray-300 py-8">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+             <!-- Updated Title -->
+             <p>&copy; 2025 AI Tools Directory. All rights reserved.</p>
+             <p class="text-sm mt-2">Your guide to the world of Artificial Intelligence tools.</p>
+              <p class="text-sm mt-2">Developed by team Noah.❤️</p>
+             <div class="mt-4 space-x-6">
+                 <a href="#" class="hover:text-white">About</a>
+                 <a href="#" class="hover:text-white">Contact</a>
+                 <a href="#" class="hover:text-white">Privacy Policy</a>
+             </div>
+         </div>
+     </footer>
+
+
+     <!-- Modal for Tool Details, News, and Sign In/Sign Up -->
+     <div id="detailsModal" class="modal">
+         <div class="modal-content">
+             <span class="close" id="modalCloseBtn">&times;</span>
+             <h2 id="modalTitle" class="text-2xl font-bold mb-4 text-gray-800 text-center"></h2> <!-- Centered Title -->
+             <div id="modalBody" class="text-gray-600 leading-relaxed"></div> <!-- Used for all modal content -->
+         </div>
+     </div>
+
+     <!-- JavaScript -->
+     <script>
+         document.addEventListener('DOMContentLoaded', () => {
+
+             // --- Global Variables ---
+             const modal = document.getElementById('detailsModal');
+             const modalTitle = document.getElementById('modalTitle');
+             const modalBody = document.getElementById('modalBody');
+             const modalCloseBtn = document.getElementById('modalCloseBtn');
+             let currentPerformanceChart = null;
+
+             // --- Map Tool Names to Homepage URLs ---
+             const toolHomepageUrls = {
+                 "Claude 3.7 Sonnet": "https://claude.ai/",
+                 "Midjourney v6.5": "https://www.midjourney.com/",
+                 "GitHub Copilot": "https://github.com/features/copilot",
+                 "RunwayML": "https://runwayml.com/",
+                 "ChatGPT (3.5)": "https://chatgpt.com/",
+                 "Google Gemini": "https://gemini.google.com/",
+                 "Leonardo.Ai": "https://leonardo.ai/",
+                 "Suno AI": "https://suno.ai/",
+                 "Grammarly": "https://www.grammarly.com/",
+                 "Phind": "https://www.phind.com/",
+                 "SynthTool 11": "#", // Example for dynamically loaded
+                 "SynthTool 12": "#",
+                 // ... add more as needed for dynamically loaded tools
+             };
+
+
+              // --- Modal Functionality ---
+             function showModal(title, content) {
+                 modalTitle.textContent = title;
+                 modalBody.innerHTML = content;
+                 modal.style.display = 'block';
+             }
+
+             function closeModal() {
+                 modal.style.display = 'none';
+                 modalTitle.textContent = '';
+                 modalBody.innerHTML = '';
+             }
+
+             modalCloseBtn.addEventListener('click', closeModal);
+             window.addEventListener('click', (event) => {
+                 if (event.target === modal) {
+                     closeModal();
+                 }
+             });
+             document.addEventListener('keydown', (event) => {
+                 if (event.key === "Escape" && modal.style.display === 'block') {
+                     closeModal();
+                 }
+             });
+
+
+             // --- Smooth Scrolling for Nav Links ---
+             document.querySelectorAll('.nav-link').forEach(anchor => {
+                 anchor.addEventListener('click', function (e) {
+                     const hrefAttribute = this.getAttribute('href');
+                     if (hrefAttribute && hrefAttribute.startsWith('#')) {
+                         e.preventDefault();
+                         const targetElement = document.querySelector(hrefAttribute);
+                         if (targetElement) {
+                              const mobileMenu = document.getElementById('mobile-menu');
+                             if (!mobileMenu.classList.contains('hidden')) {
+                                 mobileMenu.classList.add('hidden');
+                                 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                                 const icon = mobileMenuBtn?.querySelector('i');
+                                 if (icon) {
+                                     icon.classList.remove('fa-times');
+                                     icon.classList.add('fa-bars');
+                                 }
+                             }
+                              const navHeight = document.querySelector('nav').offsetHeight;
+                              const elementPosition = targetElement.getBoundingClientRect().top;
+                              const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+
+                             window.scrollTo({
+                                 top: offsetPosition,
+                                 behavior: "smooth"
+                             });
+
+                             // Update active link state in desktop nav
+                             document.querySelectorAll('nav .hidden.sm\\:flex .nav-link').forEach(link => {
+                                 link.classList.remove('border-indigo-500', 'text-gray-900');
+                                 link.classList.add('border-transparent', 'text-gray-500', 'hover:border-gray-300', 'hover:text-gray-700');
+                             });
+                             // Check parent container to apply active state correctly
+                             if (this.closest('.hidden.sm\\:flex')) {
+                                 this.classList.remove('border-transparent', 'text-gray-500', 'hover:border-gray-300', 'hover:text-gray-700');
+                                 this.classList.add('border-indigo-500', 'text-gray-900');
+                             }
+
+                             // Update active link state in mobile nav
+                             document.querySelectorAll('#mobile-menu .nav-link').forEach(link => {
+                                 link.classList.remove('border-indigo-500', 'text-indigo-700', 'bg-indigo-50');
+                                 link.classList.add('border-transparent', 'text-gray-500', 'hover:bg-gray-50', 'hover:border-gray-300', 'hover:text-gray-700');
+                             });
+                              // Check parent container to apply active state correctly
+                              if (this.closest('#mobile-menu')) {
+                                  const mobileLink = document.querySelector(`#mobile-menu a[href="${hrefAttribute}"]`);
+                                  mobileLink?.classList.remove('border-transparent', 'text-gray-500', 'hover:bg-gray-50', 'hover:border-gray-300', 'hover:text-gray-700');
+                                  mobileLink?.classList.add('border-indigo-500', 'text-indigo-700', 'bg-indigo-50');
+                              }
+                         }
+                     }
+                 });
+             });
+
+              // --- Mobile Menu Toggle ---
+             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+             const mobileMenu = document.getElementById('mobile-menu');
+             mobileMenuBtn?.addEventListener('click', () => {
+                 mobileMenu.classList.toggle('hidden');
+                 const icon = mobileMenuBtn.querySelector('i');
+                 if (icon) {
+                     icon.classList.toggle('fa-bars');
+                     icon.classList.toggle('fa-times');
+                 }
+             });
+
+             // --- Sign In / Sign Up Buttons & Modal Switching ---
+             const signInBtn = document.getElementById('signInBtn');
+             const signInBtnMobile = document.getElementById('signInBtnMobile');
+
+             // Define the Sign In content
+             const signInContent = `
+                <form id="signInForm">
+                    <div class="mb-4">
+                        <label for="signInEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" id="signInEmail" name="email" placeholder="you@example.com" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="signInPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="signInPassword" name="password" placeholder="••••••••" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                        <a href="#" class="text-xs text-indigo-600 hover:underline mt-1 block text-right modal-form-link">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition-opacity">
+                        Sign In
+                    </button>
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        Don't have an account? <a href="#" class="modal-form-link switch-to-signup">Sign up</a>
+                    </p>
+                     <p class="text-center text-xs text-gray-400 mt-3">(Sign-in/Sign-up is for demonstration only)</p>
+                </form>
+             `;
+
+             // Define the Sign Up content
+             const signUpContent = `
+                <form id="signUpForm">
+                    <div class="mb-4">
+                        <label for="signUpName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="signUpName" name="name" placeholder="Your Name" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="signUpEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" id="signUpEmail" name="email" placeholder="you@example.com" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="signUpPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="signUpPassword" name="password" placeholder="Create a password" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition-opacity">
+                         Create Account
+                    </button>
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        Already have an account? <a href="#" class="modal-form-link switch-to-signin">Sign in</a>
+                    </p>
+                    <p class="text-center text-xs text-gray-400 mt-3">(Sign-in/Sign-up is for demonstration only)</p>
+                </form>
+             `;
+
+             // Function to show Sign In Modal by default
+             function showAuthModal() {
+                 showModal('Sign In', signInContent);
+             }
+
+             signInBtn?.addEventListener('click', showAuthModal);
+             signInBtnMobile?.addEventListener('click', () => {
+                 mobileMenu.classList.add('hidden'); // Close menu first
+                 const icon = mobileMenuBtn?.querySelector('i');
+                 if (icon) {
+                     icon.classList.remove('fa-times');
+                     icon.classList.add('fa-bars');
+                 }
+                 showAuthModal();
+             });
+
+             // Event Delegation for Modal Content Switching (Sign In <-> Sign Up)
+             modal.addEventListener('click', (e) => {
+                 if (e.target.matches('.switch-to-signup')) {
+                     e.preventDefault();
+                     modalTitle.textContent = 'Sign Up';
+                     modalBody.innerHTML = signUpContent;
+                 } else if (e.target.matches('.switch-to-signin')) {
+                     e.preventDefault();
+                     modalTitle.textContent = 'Sign In';
+                     modalBody.innerHTML = signInContent;
+                 } else if (e.target.closest('form')) { // Handle form submissions within modal
+                     const form = e.target.closest('form');
+                     if (e.target.tagName === 'BUTTON' && e.target.type === 'submit') {
+                         e.preventDefault(); // Prevent actual submission for demo
+                         console.log(`Demo form submitted: ${form.id}`);
+                          // You could add validation feedback here
+                         if (form.id === 'signInForm') {
+                             showModal('Sign In (Demo)', '<p>Sign in successful! (Demo)</p><p>Redirecting (simulated)...</p>');
+                         } else if (form.id === 'signUpForm') {
+                             showModal('Sign Up (Demo)', '<p>Account created successfully! (Demo)</p><p>You can now sign in (simulated)...</p>');
+                         }
+                         setTimeout(closeModal, 1500); // Close modal after message
+                     }
+                 }
+             });
+             // --- END OF Sign In / Sign Up ---
+
+
+              // --- Hero Category Select ---
+             const heroCategorySelect = document.getElementById('heroCategorySelect');
+             heroCategorySelect?.addEventListener('change', (e) => {
+                  if (e.target.value !== 'All Categories') {
+                      const trendingListContainer = document.querySelector('#home .space-y-4');
+                      trendingListContainer?.childNodes.forEach(node => {
+                         if(node.nodeType === 1) {
+                             node.style.opacity = (e.target.value === 'All Categories' || node.textContent.includes(e.target.value.split(' ')[0])) ? '1' : '0.5';
+                         }
+                      });
+                      console.log(`Filtering trending tools by ${e.target.value} (visual indication only).`);
+                  } else {
+                       const trendingListContainer = document.querySelector('#home .space-y-4');
+                      trendingListContainer?.childNodes.forEach(node => {
+                          if(node.nodeType === 1) node.style.opacity = '1';
+                      });
+                       console.log('Showing all trending tools.');
+                  }
+              });
+
+             // --- Stats Animation ---
+             function animateStats() {
+                 const stats = document.querySelectorAll('.bg-indigo-700 .text-4xl[data-target]');
+                 stats.forEach(stat => {
+                     const target = parseInt(stat.dataset.target, 10);
+                      if (stat.dataset.animated) return;
+                      stat.dataset.animated = true;
+
+                     let count = 0;
+                     const duration = 1500;
+                     const stepTime = 16;
+                     const totalSteps = duration / stepTime;
+                     const increment = target / totalSteps;
+
+                     const updateCount = () => {
+                         count += increment;
+                         if (count < target) {
+                             stat.textContent = Math.ceil(count).toLocaleString() + (stat.textContent.includes('+') ? '+' : '');
+                             requestAnimationFrame(updateCount);
+                         } else {
+                             stat.textContent = target.toLocaleString() + (stat.textContent.includes('+') ? '+' : '');
+                         }
+                     };
+                      setTimeout(updateCount, 100);
+                 });
+             }
+              const statsSection = document.querySelector('.bg-indigo-800');
+              if (statsSection) {
+                  const observer = new IntersectionObserver((entries, obs) => {
+                      entries.forEach(entry => {
+                          if (entry.isIntersecting) {
+                              animateStats();
+                              obs.unobserve(entry.target);
+                          }
+                      });
+                  }, { threshold: 0.1 });
+                  observer.observe(statsSection);
+              }
+
+
+             // --- Tool Directory ---
+             const toolFilterButtonsContainer = document.getElementById('toolFilterButtons');
+             const toolSearchInput = document.getElementById('toolSearchInput');
+             const toolSortSelect = document.getElementById('toolSortSelect');
+             const toolsGrid = document.getElementById('toolsGrid');
+             const allToolCards = toolsGrid ? Array.from(toolsGrid.querySelectorAll('.tool-card')) : [];
+             const noMoreToolsMsg = document.getElementById('no-more-tools');
+
+             function filterAndSortTools() {
+                 if (!toolsGrid) return;
+
+                 const selectedCategoryFilter = toolFilterButtonsContainer?.querySelector('.filter-button-active')?.dataset.filter || 'all';
+                 const searchTerm = toolSearchInput?.value.toLowerCase() || '';
+                 const sortValue = toolSortSelect?.value || 'popularity';
+
+                 let filteredTools = allToolCards.filter(card => {
+                     const cardCategory = card.dataset.category?.toLowerCase() || '';
+                     const categoryMatch = selectedCategoryFilter === 'all' || cardCategory === selectedCategoryFilter;
+
+                     const toolName = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                     const toolVendor = card.querySelector('h3 + p')?.textContent.toLowerCase() || '';
+                     const toolDesc = card.querySelector('p.text-gray-600')?.textContent.toLowerCase() || '';
+                     const searchMatch = toolName.includes(searchTerm) || toolDesc.includes(searchTerm) || toolVendor.includes(searchTerm);
+
+                     return categoryMatch && searchMatch;
+                 });
+
+                  filteredTools.sort((a, b) => {
+                     switch (sortValue) {
+                         case 'rating':
+                             const ratingA = parseFloat(a.dataset.rating || 0);
+                             const ratingB = parseFloat(b.dataset.rating || 0);
+                             return ratingB - ratingA;
+                         case 'newest':
+                              const dateA = new Date(a.dataset.date || 0);
+                              const dateB = new Date(b.dataset.date || 0);
+                              if (isNaN(dateA) && isNaN(dateB)) return 0;
+                              if (isNaN(dateA)) return 1;
+                              if (isNaN(dateB)) return -1;
+                              return dateB - dateA;
+                         case 'price_asc':
+                             const priceA = parseFloat(a.querySelector('.tool-price')?.dataset.priceLow ?? 9999);
+                             const priceB = parseFloat(b.querySelector('.tool-price')?.dataset.priceLow ?? 9999);
+                             return priceA - priceB;
+                         case 'popularity':
+                         default:
+                            return allToolCards.indexOf(a) - allToolCards.indexOf(b);
+                     }
+                 });
+
+                 // Update Grid Display
+                 const currentCardsInGrid = new Set(toolsGrid.children);
+                 const noResultsMessageId = 'no-results-message-tools';
+                 let noResultsElement = document.getElementById(noResultsMessageId);
+
+                 currentCardsInGrid.forEach(card => {
+                     if (!filteredTools.includes(card) && card.id !== noResultsMessageId && !card.classList.contains('animate-pulse') /* Don't remove pulse cards */) {
+                         card.remove();
+                     }
+                 });
+
+                  if (filteredTools.length > 0 && noResultsElement) {
+                      noResultsElement.remove();
+                      noResultsElement = null;
+                  }
+
+                  let lastElement = null;
+                  filteredTools.forEach(card => {
+                      if (!toolsGrid.contains(card)) {
+                          toolsGrid.insertBefore(card, lastElement ? lastElement.nextSibling : toolsGrid.firstChild);
+                      }
+                      lastElement = card;
+                  });
+
+                 if (filteredTools.length === 0 && !noResultsElement && !toolsGrid.querySelector('.animate-pulse')) { // Only show if no results AND no pulse cards
+                      const p = document.createElement('p');
+                      p.id = noResultsMessageId;
+                      p.className = 'text-gray-500 col-span-full text-center py-10';
+                      p.textContent = 'No tools match your criteria.';
+                      toolsGrid.appendChild(p);
+                 }
+             }
+
+             toolFilterButtonsContainer?.addEventListener('click', (e) => {
+                 if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('filter-button-active')) {
+                     toolFilterButtonsContainer.querySelectorAll('button').forEach(btn => {
+                         btn.classList.remove('filter-button-active');
+                         btn.classList.add('filter-button-inactive');
+                     });
+                     e.target.classList.remove('filter-button-inactive');
+                     e.target.classList.add('filter-button-active');
+                     filterAndSortTools();
+                 }
+             });
+             toolSearchInput?.addEventListener('input', filterAndSortTools);
+             toolSortSelect?.addEventListener('change', filterAndSortTools);
+
+             // Load More Tools Button
+             const loadMoreToolsBtn = document.getElementById('loadMoreTools');
+             let toolsCurrentIndex = 0; // Use index for loading simulated batches
+             const toolsPerLoad = 6;
+             const totalSimulatedTools = 18; // Total tools including initial + loadable
+
+             loadMoreToolsBtn?.addEventListener('click', () => {
+                 if (toolsCurrentIndex >= totalSimulatedTools) return; // Already loaded all
+
+                 const fragment = document.createDocumentFragment();
+                 const pulseCards = [];
+                 for (let i = 0; i < toolsPerLoad; i++) {
+                      if (allToolCards.length + i >= totalSimulatedTools) break; // Stop if exceeding total
+                      const pulseCard = createPulseCard();
+                      fragment.appendChild(pulseCard);
+                      pulseCards.push(pulseCard);
+                 }
+                 toolsGrid?.appendChild(fragment);
+
+                 loadMoreToolsBtn.disabled = true;
+                 loadMoreToolsBtn.innerHTML = 'Loading... <i class="fas fa-spinner fa-spin ml-2"></i>';
+
+                  setTimeout(() => {
+                      pulseCards.forEach((pulseCard, index) => {
+                           const newToolIndex = allToolCards.length; // Index for the next tool
+                          if (newToolIndex < totalSimulatedTools) {
+                              const newTool = createSampleToolCard(newToolIndex + 1); // ID starts from 1
+                              allToolCards.push(newTool); // Add to master list
+                              pulseCard.replaceWith(newTool); // Replace pulse with real card
+                              attachSingleToolCardEvents(newTool); // Attach events
+                          } else {
+                               pulseCard.remove(); // Remove leftover pulse if we reached total
+                          }
+                      });
+
+                      toolsCurrentIndex = allToolCards.length; // Update current index
+                      filterAndSortTools(); // Re-apply filters/sort
+
+                      loadMoreToolsBtn.disabled = false;
+                      loadMoreToolsBtn.innerHTML = 'Load More Tools <i class="fas fa-chevron-down ml-2"></i>';
+
+                      if (toolsCurrentIndex >= totalSimulatedTools) {
+                         loadMoreToolsBtn.classList.add('hidden');
+                         noMoreToolsMsg?.classList.remove('hidden');
+                      }
+                  }, 800);
+             });
+
+             function createPulseCard() { /* ... (keep existing function) ... */
+                  const pulseCard = document.createElement('div');
+                  pulseCard.className = 'bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden animate-pulse p-5'; // Removed tool-card class temporarily
+                  pulseCard.innerHTML = `
+                     <div class="flex items-center justify-between mb-4"> <div class="flex items-center"> <div class="h-10 w-10 bg-gray-200 rounded-lg mr-3"></div> <div> <div class="h-4 bg-gray-300 rounded w-32 mb-1"></div> <div class="h-3 bg-gray-200 rounded w-20"></div> </div> </div> <div class="h-4 bg-gray-200 rounded w-16"></div> </div> <div class="h-3 bg-gray-300 rounded w-full mb-2"></div> <div class="h-3 bg-gray-300 rounded w-5/6 mb-4"></div> <div class="flex items-center justify-between mb-4"> <div class="flex items-center"> <div class="h-4 bg-gray-200 rounded w-12"></div> <span class="mx-2 text-gray-300">|</span> <div class="h-4 bg-gray-200 rounded w-20"></div> </div> <div class="h-4 bg-gray-200 rounded w-16"></div> </div> <div class="flex flex-wrap gap-2 mb-4"> <div class="h-4 bg-gray-200 rounded w-16"></div> <div class="h-4 bg-gray-200 rounded w-12"></div> <div class="h-4 bg-gray-200 rounded w-20"></div> </div> <div class="flex justify-between"> <div class="h-4 bg-gray-300 rounded w-24"></div> <div class="h-8 bg-gray-300 rounded w-20"></div> </div>
+                 `;
+                  return pulseCard;
+             }
+
+             function createSampleToolCard(id) { /* ... (keep existing function) ... */
+                 const categories = ['text ai', 'image ai', 'code ai', 'video ai', 'audio ai', 'utility ai'];
+                 const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+                 const randomRating = (Math.random() * 1.5 + 3.5).toFixed(1);
+                 const randomDateObj = new Date(Date.now() - Math.random() * 120 * 24 * 60 * 60 * 1000); // Last 120 days
+                 const randomDate = randomDateObj.toISOString().split('T')[0];
+                 const prices = [ { text: 'Free', low: 0, high: 0 }, { text: '$10/mo', low: 10, high: 10 }, { text: '$5 - $25/mo', low: 5, high: 25 }, { text: 'Free - $15/mo', low: 0, high: 15 }, { text: 'Custom Pricing', low: 998, high: 998 }];
+                 const randomPrice = prices[Math.floor(Math.random() * prices.length)];
+                 const toolName = `SynthTool ${id}`; // Use consistent name prefix
+                 const vendorName = `Innovate AI ${String.fromCharCode(65 + (id % 26))}`;
+                 const sampleTags = ["Creative", "Automation", "Productivity", "Analysis", "Generation", "Assistant", "Workflow", "Optimization"];
+
+                  let iconClass = 'fa-puzzle-piece text-gray-600'; let bgColorClass = 'bg-gray-100'; let tagBgColorClass = 'bg-gray-100'; let tagTextColorClass = 'text-gray-800';
+                  switch (randomCategory) {
+                     case 'text ai': iconClass = 'fa-comment-alt text-blue-600'; bgColorClass = 'bg-blue-100'; tagBgColorClass = 'bg-blue-100'; tagTextColorClass = 'text-blue-800'; break;
+                     case 'image ai': iconClass = 'fa-image text-purple-600'; bgColorClass = 'bg-purple-100'; tagBgColorClass = 'bg-purple-100'; tagTextColorClass = 'text-purple-800'; break;
+                     case 'code ai': iconClass = 'fa-code text-green-600'; bgColorClass = 'bg-green-100'; tagBgColorClass = 'bg-green-100'; tagTextColorClass = 'text-green-800'; break;
+                     case 'video ai': iconClass = 'fa-video text-red-600'; bgColorClass = 'bg-red-100'; tagBgColorClass = 'bg-red-100'; tagTextColorClass = 'text-red-800'; break;
+                     case 'audio ai': iconClass = 'fa-music text-yellow-600'; bgColorClass = 'bg-yellow-100'; tagBgColorClass = 'bg-yellow-100'; tagTextColorClass = 'text-yellow-800'; break;
+                     case 'utility ai': iconClass = 'fa-cogs text-emerald-600'; bgColorClass = 'bg-emerald-100'; tagBgColorClass = 'bg-emerald-100'; tagTextColorClass = 'text-emerald-800'; break;
+                  }
+
+                 const newTool = document.createElement('div');
+                 newTool.className = 'bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card';
+                 newTool.dataset.category = randomCategory;
+                 newTool.dataset.rating = randomRating;
+                 newTool.dataset.date = randomDate;
+                 if (!toolHomepageUrls[toolName]) { toolHomepageUrls[toolName] = '#'; }
+
+                 newTool.innerHTML = `
+                     <div class="p-5">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center"> <div class="h-10 w-10 ${bgColorClass} rounded-lg flex items-center justify-center mr-3"><i class="fas ${iconClass}"></i></div> <div> <h3 class="text-lg font-semibold text-gray-900">${toolName}</h3> <p class="text-sm text-gray-500">${vendorName}</p> </div> </div>
+                             <div class="flex items-center"><span class="${tagBgColorClass} ${tagTextColorClass} text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">${randomCategory.replace(' ai','').split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ')}</span></div>
+                         </div>
+                         <p class="text-gray-600 text-sm mb-4 line-clamp-3">Dynamically loaded sample tool: ${toolName}. Aids in ${randomCategory} tasks and enhances ${sampleTags[id % sampleTags.length].toLowerCase()} for various applications.</p>
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center"> <div class="flex items-center"><i class="fas fa-star text-yellow-400"></i><span class="ml-1 text-gray-600 text-sm tool-rating">${randomRating}</span></div> <span class="mx-2 text-gray-300">|</span> <div class="flex items-center"><i class="fas fa-comment text-gray-400"></i><span class="ml-1 text-gray-600 text-sm">${Math.floor(Math.random() * 200 + 5)} reviews</span></div> </div>
+                             <div><span class="text-sm font-medium text-gray-700 tool-price" data-price-low="${randomPrice.low}" data-price-high="${randomPrice.high}">${randomPrice.text}</span></div>
+                         </div>
+                         <div class="flex flex-wrap gap-1 mb-4"> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">${sampleTags[(id*2) % sampleTags.length]}</span> <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">${sampleTags[(id*3) % sampleTags.length]}</span> </div>
+                         <div class="flex justify-between"> <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool="${toolName}">View Details</a> <button class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now" data-tool="${toolName}">Try Now</button> </div>
+                     </div>`;
+                 return newTool;
+             }
+
+             function attachSingleToolCardEvents(cardElement) { /* ... (keep existing function) ... */
+                 const detailsLink = cardElement.querySelector('.view-details');
+                 const tryButton = cardElement.querySelector('.try-now');
+
+                 // Remove previous before adding new to prevent duplicates
+                 detailsLink?.removeEventListener('click', handleViewDetails);
+                 tryButton?.removeEventListener('click', handleTryNow);
+
+                 detailsLink?.addEventListener('click', handleViewDetails);
+                 tryButton?.addEventListener('click', handleTryNow);
+             }
+
+             function handleViewDetails(e) { /* ... (keep existing function) ... */
+                  e.preventDefault();
+                  const toolCard = e.target.closest('.tool-card');
+                  if (!toolCard) return;
+                  const toolName = e.target.getAttribute('data-tool');
+                  const detailsContent = `
+                     <p class="mb-4">Displaying details for <strong>${toolName}</strong>.</p>
+                     <p class="mb-2"><strong>Category:</strong> ${toolCard.dataset.category?.replace(' ai','').split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ') || 'N/A'}</p>
+                     <p class="mb-2"><strong>Rating:</strong> ${toolCard.dataset.rating || 'N/A'} <i class="fas fa-star text-yellow-400 ml-1"></i></p>
+                     <p class="mb-2"><strong>Pricing:</strong> ${toolCard.querySelector('.tool-price')?.textContent || 'N/A'}</p>
+                     <p class="mb-4"><strong>Description:</strong> ${toolCard.querySelector('p.text-gray-600')?.textContent || 'No description available.'}</p>
+                     <p><em>(Full details would be loaded here in a real app.)</em></p>
+                     <button class="mt-4 px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now-modal" data-tool="${toolName}">Try ${toolName} Now</button>
+                 `;
+                  showModal(`${toolName} - Details`, detailsContent);
+              }
+
+             function handleTryNow(e) { /* ... (keep existing function) ... */
+                  const toolName = e.target.getAttribute('data-tool');
+                  const url = toolHomepageUrls[toolName];
+                  if (url && url !== '#') {
+                      window.open(url, '_blank');
+                  } else {
+                      showModal('Link Not Available', `<p>We don't have a direct link for <strong>${toolName}</strong> currently. Please search for their official website.</p>`);
+                  }
+              }
+
+             function attachAllToolCardEvents(container) { /* ... (keep existing function) ... */
+                 container.querySelectorAll('.tool-card').forEach(card => {
+                      attachSingleToolCardEvents(card);
+                  });
+                  // Add listener for modal's try now button only once
+                  if (!modal.dataset.tryNowListenerAttached) {
+                      modal.addEventListener('click', function(e) {
+                         if (e.target && e.target.classList.contains('try-now-modal')) {
+                             handleTryNow(e);
+                         }
+                      });
+                      modal.dataset.tryNowListenerAttached = 'true';
+                  }
+             }
+
+              if (toolsGrid) { attachAllToolCardEvents(toolsGrid); }
+
+
+              // --- Comparison Tool ---
+             const compareSelects = document.querySelectorAll('#comparison .compare-select');
+             const compareBtn = document.getElementById('compareBtn');
+             const comparisonResultsDiv = document.getElementById('comparisonResults');
+             const comparisonTable = document.getElementById('comparisonTable');
+             const comparisonPlaceholder = document.getElementById('comparisonPlaceholder');
+             const performanceChartCanvas = document.getElementById('performanceChart');
+
+             const toolComparisonData = { /* ... (keep existing data) ... */
+                 "Claude 3.7 Sonnet": { category: "Text AI", rating: 4.9, price: "Free - $20/mo", core_feature: "Advanced Reasoning", api: "Yes", use_case: "Research, Writing, Coding" },
+                 "Midjourney v6.5": { category: "Image AI", rating: 4.8, price: "$10 - $60/mo", core_feature: "Artistic Images", api: "No (Discord Bot)", use_case: "Art, Design, Concepting" },
+                 "GitHub Copilot": { category: "Code AI", rating: 4.7, price: "$10/mo", core_feature: "Code Completion", api: "N/A (IDE Plugin)", use_case: "Software Development" },
+                 "RunwayML": { category: "Video AI", rating: 4.6, price: "Free - $35+/mo", core_feature: "Gen-2 Video", api: "Yes", use_case: "Video Editing, Creative Content" },
+                 "ChatGPT (3.5)": { category: "Text AI", rating: 4.7, price: "Free / $20/mo", core_feature: "Conversational AI", api: "Yes", use_case: "General Purpose, Writing" },
+                 "Google Gemini": { category: "Text AI", rating: 4.6, price: "Free / $20/mo", core_feature: "Multimodal", api: "Yes", use_case: "Research, Conversation" },
+                 "Leonardo.Ai": { category: "Image AI", rating: 4.7, price: "Free Credits / $12+/mo", core_feature: "Image Models", api: "Yes", use_case: "Art, Game Assets, Design" },
+                 "Suno AI": { category: "Audio AI", rating: 4.6, price: "Free Credits / $10+/mo", core_feature: "Song Generation", api: "No", use_case: "Music Creation, Fun" },
+                 "Grammarly": { category: "Utility AI", rating: 4.8, price: "Free / $12+/mo", core_feature: "Writing Assistant", api: "Yes (Limited)", use_case: "Proofreading, Style" },
+                 "Phind": { category: "Code AI", rating: 4.5, price: "Free / $20/mo", core_feature: "Developer Search", api: "No", use_case: "Coding Help, Debugging" },
+                 // Add sample tool data dynamically if they are loaded and selectable
+                 // "SynthTool 11": { category: "Text AI", rating: 4.2, price: "$5/mo", core_feature: "Summarization", api: "No", use_case: "Content Digesting" },
+             };
+             const comparisonFeatures = { /* ... (keep existing data) ... */
+                 category: "Category", rating: "Rating", price: "Pricing", core_feature: "Core Feature", api: "API Access", use_case: "Primary Use Case"
+             };
+
+             compareBtn?.addEventListener('click', () => { /* ... (keep existing function) ... */
+                 const selectedTools = Array.from(compareSelects)
+                                            .map(select => select.value)
+                                            .filter(value => value && value !== "");
+                  const uniqueSelectedTools = [...new Set(selectedTools)];
+
+                 if (uniqueSelectedTools.length < 2) {
+                     showModal('Selection Error', '<p>Please select at least 2 different tools to compare.</p>');
+                     comparisonResultsDiv.classList.add('hidden');
+                     comparisonPlaceholder.classList.remove('hidden');
+                      if (currentPerformanceChart) currentPerformanceChart.destroy();
+                      comparisonTable.querySelector('tbody').innerHTML = '';
+                      comparisonTable.querySelector('thead tr').innerHTML = '<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Features</th>';
+                     return;
+                 }
+                 if (uniqueSelectedTools.length > 4) {
+                      showModal('Selection Limit', '<p>You can compare a maximum of 4 tools at a time.</p>');
+                      return;
+                 }
+
+                 // Check if all selected tools have data
+                  let missingData = false;
+                  uniqueSelectedTools.forEach(toolName => {
+                      if (!toolComparisonData[toolName]) {
+                         // Try to get data from the card if it exists in the DOM (for dynamic tools)
+                         const card = allToolCards.find(c => c.querySelector('h3')?.textContent === toolName);
+                         if (card) {
+                             toolComparisonData[toolName] = { // Populate minimum required data
+                                 category: card.dataset.category?.replace(' ai','').split(' ').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ') || 'N/A',
+                                 rating: parseFloat(card.dataset.rating) || 0,
+                                 price: card.querySelector('.tool-price')?.textContent || 'N/A',
+                                 core_feature: 'Dynamic Tool Feature', // Placeholder
+                                 api: 'Unknown',
+                                 use_case: 'Various'
+                             };
+                         } else {
+                             console.warn(`No comparison data found for: ${toolName}`);
+                             missingData = true;
+                         }
+                      }
+                  });
+
+                  if (missingData) {
+                      showModal('Data Missing', '<p>Comparison data for one or more selected (dynamically loaded?) tools is not fully available. Showing available data.</p>');
+                      // Allow comparison to proceed with available data / N/A values
+                  }
+
+                 updateComparisonTable(uniqueSelectedTools);
+                 updatePerformanceChart(uniqueSelectedTools);
+                 comparisonResultsDiv.classList.remove('hidden');
+                 comparisonPlaceholder.classList.add('hidden');
+             });
+
+             function updateComparisonTable(tools) { /* ... (keep existing function) ... */
+                 const thead = comparisonTable.querySelector('thead tr');
+                 const tbody = comparisonTable.querySelector('tbody');
+
+                 thead.innerHTML = '<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Features</th>';
+                 tbody.innerHTML = '';
+
+                 tools.forEach(toolName => {
+                     const th = document.createElement('th');
+                     th.scope = 'col';
+                     th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]';
+                     th.textContent = toolName;
+                     thead.appendChild(th);
+                 });
+
+                  Object.entries(comparisonFeatures).forEach(([featureKey, featureName]) => {
+                     const row = tbody.insertRow();
+                     const featureCell = row.insertCell();
+                     featureCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white z-10';
+                     featureCell.textContent = featureName;
+
+                     tools.forEach(toolName => {
+                         const dataCell = row.insertCell();
+                         dataCell.className = 'px-6 py-4 whitespace-normal text-sm text-gray-500 align-top';
+                         const toolData = toolComparisonData[toolName];
+                         const value = toolData?.[featureKey] ?? 'N/A';
+
+                          if (featureKey === 'rating' && typeof value === 'number') {
+                              dataCell.innerHTML = `${value.toFixed(1)} <i class="fas fa-star text-yellow-400 ml-1"></i>`;
+                          } else {
+                              dataCell.textContent = value;
+                          }
+                     });
+                 });
+             }
+
+             function updatePerformanceChart(tools) { /* ... (keep existing function, slightly improved logic) ... */
+                 if (!performanceChartCanvas) return;
+                 const ctx = performanceChartCanvas.getContext('2d');
+
+                 if (currentPerformanceChart) { currentPerformanceChart.destroy(); currentPerformanceChart = null; }
+
+                  const datasets = [{
+                     label: 'Overall Score (Demo)',
+                     data: tools.map(toolName => {
+                          const data = toolComparisonData[toolName];
+                          const baseScore = data?.rating ? data.rating * 18 : 60; // Base score on rating
+                          const randomness = data?.rating ? (Math.random() * 10 - 5) * (data.rating / 5) : Math.random() * 6 - 3; // Less variability if no rating
+                          return Math.min(98, Math.max(30, Math.round(baseScore + randomness)));
+                     }),
+                      backgroundColor: [ 'rgba(59, 130, 246, 0.6)', 'rgba(139, 92, 246, 0.6)', 'rgba(16, 185, 129, 0.6)', 'rgba(234, 179, 8, 0.6)', 'rgba(239, 68, 68, 0.6)', ].slice(0, tools.length),
+                     borderColor: [ 'rgba(59, 130, 246, 1)', 'rgba(139, 92, 246, 1)', 'rgba(16, 185, 129, 1)', 'rgba(234, 179, 8, 1)', 'rgba(239, 68, 68, 1)', ].slice(0, tools.length),
+                     borderWidth: 1
+                  }];
+
+                 currentPerformanceChart = new Chart(ctx, {
+                     type: 'bar',
+                     data: {
+                         labels: tools.map(name => name.length > 15 ? name.substring(0, 12) + '...' : name),
+                         datasets: datasets
+                     },
+                     options: {
+                         indexAxis: tools.length > 4 ? 'y' : 'x',
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'Performance Score (0-100)' } }, x: { ticks: { maxRotation: 0, minRotation: 0 } } },
+                         plugins: { legend: { display: false }, tooltip: { callbacks: { title: (tooltipItems) => tools[tooltipItems[0].dataIndex] || '', label: (context) => `${context.dataset.label || ''}: ${context.parsed.y?.toFixed(0) ?? context.parsed.x?.toFixed(0) ?? 'N/A'}` } } }
+                     }
+                 });
+             }
+
+              // Populate compare selects with tools from the grid + predefined list initially
+              function populateCompareSelects() {
+                 const toolNames = new Set(Object.keys(toolComparisonData)); // Start with predefined
+                  allToolCards.forEach(card => { // Add from initial grid cards
+                       const name = card.querySelector('h3')?.textContent;
+                       if (name) toolNames.add(name);
+                  });
+
+                  const sortedNames = Array.from(toolNames).sort(); // Sort alphabetically
+
+                  compareSelects.forEach(select => {
+                      const currentValue = select.value; // Preserve selection if possible
+                      select.innerHTML = '<option value="">Select AI Tool...</option>'; // Reset options
+                      sortedNames.forEach(name => {
+                          const option = document.createElement('option');
+                          option.value = name;
+                          option.textContent = name;
+                          select.appendChild(option);
+                      });
+                      select.value = currentValue; // Restore selection
+                  });
+              }
+              populateCompareSelects(); // Call initially
+              // Note: You might need to re-call populateCompareSelects() after loading more tools if you want dynamically loaded tools to appear in the compare dropdowns immediately.
+
+
+             // --- AI News ---
+             const newsFilterButtonsContainer = document.getElementById('newsFilterButtons');
+             const newsSortSelect = document.getElementById('newsSortSelect');
+             const newsGrid = document.getElementById('newsGrid');
+             const allNewsCards = newsGrid ? Array.from(newsGrid.querySelectorAll('.news-card')) : [];
+             const loadMoreNewsBtn = document.getElementById('loadMoreNews'); // Add button reference
+             const noMoreNewsMsg = document.getElementById('no-more-news');
+
+             function filterAndSortNews() { /* ... (keep existing function) ... */
+                  if (!newsGrid) return;
+
+                 const selectedCategoryFilter = newsFilterButtonsContainer?.querySelector('.filter-button-active')?.dataset.filter || 'all';
+                 const sortValue = newsSortSelect?.value || 'latest';
+
+                  let filteredNews = allNewsCards.filter(card => {
+                     const cardCategory = card.dataset.category?.toLowerCase() || '';
+                     return selectedCategoryFilter === 'all' || cardCategory === selectedCategoryFilter;
+                  });
+
+                  filteredNews.sort((a, b) => {
+                      switch (sortValue) {
+                          case 'most_read': // Using image alt text as a dummy proxy for read count
+                              const readsA = a.querySelector('img')?.alt.length || 0;
+                              const readsB = b.querySelector('img')?.alt.length || 0;
+                              return readsB - readsA;
+                          case 'featured': // Assume first item is featured for demo
+                               return allNewsCards.indexOf(b) === 0 ? 1 : (allNewsCards.indexOf(a) === 0 ? -1 : 0);
+                          case 'latest':
+                          default:
+                              const dateA = new Date(a.dataset.date || 0);
+                              const dateB = new Date(b.dataset.date || 0);
+                              if (isNaN(dateA) && isNaN(dateB)) return 0;
+                              if (isNaN(dateA)) return 1;
+                              if (isNaN(dateB)) return -1;
+                              return dateB - dateA;
+                      }
+                  });
+
+                 // Update Grid
+                  const currentCardsInGridNews = new Set(newsGrid.children);
+                  const noResultsMessageIdNews = 'no-results-message-news';
+                  let noResultsElementNews = document.getElementById(noResultsMessageIdNews);
+
+                  currentCardsInGridNews.forEach(card => {
+                      if (!filteredNews.includes(card) && card.id !== noResultsMessageIdNews) {
+                          card.remove();
+                      }
+                  });
+
+                  if (filteredNews.length > 0 && noResultsElementNews) {
+                      noResultsElementNews.remove(); noResultsElementNews = null;
+                  }
+
+                  let lastNewsElement = null;
+                  filteredNews.forEach(card => {
+                      if (!newsGrid.contains(card)) {
+                          newsGrid.insertBefore(card, lastNewsElement ? lastNewsElement.nextSibling : newsGrid.firstChild);
+                      }
+                      lastNewsElement = card;
+                  });
+
+                  if (filteredNews.length === 0 && !noResultsElementNews) {
+                      const p = document.createElement('p');
+                      p.id = noResultsMessageIdNews;
+                      p.className = 'text-gray-500 col-span-full text-center py-10';
+                      p.textContent = 'No news articles match your criteria.';
+                      newsGrid.appendChild(p);
+                  }
+                  // Don't re-attach events here, use delegation below
+             }
+
+             newsFilterButtonsContainer?.addEventListener('click', (e) => { /* ... (keep existing function) ... */
+                 if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('filter-button-active')) {
+                     newsFilterButtonsContainer.querySelectorAll('button').forEach(btn => {
+                          btn.classList.remove('filter-button-active'); btn.classList.add('filter-button-inactive');
+                     });
+                      e.target.classList.remove('filter-button-inactive'); e.target.classList.add('filter-button-active');
+                     filterAndSortNews();
+                 }
+             });
+              newsSortSelect?.addEventListener('change', filterAndSortNews);
+
+              const newsArticleContent = { /* ... (keep existing content) ... */
+                 'claude': `<p class="mb-4">Anthropic officially launched Claude 3.7 Sonnet today... (Full content from previous example)</p>`,
+                 'video': `<p class="mb-4">A new market analysis report... (Full content from previous example)</p>`,
+                 'research': `<p class="mb-4">Researchers from the 'Cognitive Computation Lab'... (Full content from previous example)</p>`
+              };
+
+             // Event Delegation for News "Read More" clicks
+              if (newsGrid) {
+                 newsGrid.addEventListener('click', (e) => {
+                     const readMoreLink = e.target.closest('.read-more');
+                     if (readMoreLink) {
+                         e.preventDefault();
+                         const newsCard = readMoreLink.closest('.news-card');
+                         if (!newsCard) return;
+
+                         const newsKey = readMoreLink.getAttribute('data-news');
+                         const articleTitle = newsCard.querySelector('h3')?.textContent || 'News Article';
+                         const articleContent = newsArticleContent[newsKey] || '<p>Full article content not available at the moment.</p>';
+                         showModal(articleTitle, articleContent);
+                     }
+                 });
+              }
+
+
+             // --- AI Matchmaker ---
+             const matchmakerForm = document.getElementById('matchmakerForm');
+             matchmakerForm?.addEventListener('submit', (e) => { /* ... (keep existing function) ... */
+                 e.preventDefault();
+                 const useCaseSelect = document.getElementById('useCaseSelect');
+                 const budgetSelect = document.getElementById('budgetSelect');
+                 const skillLevelSelect = document.getElementById('skillLevelSelect');
+                 const useCase = useCaseSelect?.value; const budget = budgetSelect?.value; const skill = skillLevelSelect?.value;
+
+                 if (!useCase || !budget || !skill) {
+                      showModal('Missing Information', '<p>Please select an option for all three questions.</p>');
+                      [useCaseSelect, budgetSelect, skillLevelSelect].forEach(sel => { if (sel && !sel.value) sel.classList.add('border-red-500','ring-1','ring-red-500'); else sel?.classList.remove('border-red-500','ring-1','ring-red-500'); });
+                      return;
+                 }
+                  [useCaseSelect, budgetSelect, skillLevelSelect].forEach(sel => sel?.classList.remove('border-red-500','ring-1','ring-red-500'));
+
+                 let recommendation = "<div class='space-y-3'>";
+                 let toolSuggestions = [];
+
+                  // --- Matching Logic (Simplified Example - use previous logic) ---
+                  if (useCase === 'Text Generation' && budget === 'Free') toolSuggestions.push({ name: 'ChatGPT (3.5)', reason: "Great free starting point." });
+                  if (useCase === 'Text Generation' && budget !== 'Free') toolSuggestions.push({ name: 'Claude 3.7 Sonnet', reason: "Excellent reasoning.", isPaid: true });
+                  if (useCase === 'Image Creation' && budget === 'Free') toolSuggestions.push({ name: 'Leonardo.Ai', reason: "Generous free credits." });
+                  if (useCase === 'Image Creation' && budget !== 'Free') toolSuggestions.push({ name: 'Midjourney v6.5', reason: "Top artistic quality.", isPaid: true });
+                  if (useCase === 'Coding Assistance') toolSuggestions.push({ name: 'GitHub Copilot', reason: "Industry standard.", isPaid: budget !== 'Free'});
+                  if (useCase === 'Coding Assistance' && budget === 'Free') toolSuggestions.push({ name: 'Phind', reason: "Developer-focused search." });
+                  if (useCase === 'Video Generation') toolSuggestions.push({ name: 'RunwayML', reason: "Leading video suite.", isPaid: budget === 'High' });
+                  if (useCase === 'Audio Creation') toolSuggestions.push({ name: 'Suno AI', reason: "Full song generation.", isPaid: budget !== 'Free' });
+                  if (useCase === 'Writing Improvement') toolSuggestions.push({ name: 'Grammarly', reason: "Comprehensive writing aid.", isPaid: budget !== 'Free' });
+                  if (toolSuggestions.length === 0) toolSuggestions.push({ name: 'Explore the Directory', reason: "Your needs are unique! Browse all tools." });
+
+                  // --- Construct Modal Content ---
+                  recommendation += "<p class='text-lg font-semibold mb-2'>Based on your choices, consider these:</p>";
+                  recommendation += "<ul class='list-disc list-inside space-y-2'>";
+                  toolSuggestions.slice(0, 3).forEach(tool => {
+                      const toolCardElement = allToolCards.find(card => card.querySelector('h3')?.textContent.includes(tool.name));
+                      let detailsLink = `<strong class='text-indigo-700'>${tool.name}</strong>`;
+                      if(toolCardElement) {
+                         const exactToolName = toolCardElement.querySelector('h3')?.textContent;
+                         detailsLink = `<a href="#" class='text-indigo-600 hover:underline font-semibold view-details-matchmaker' data-tool="${exactToolName}">${tool.name}</a>`;
+                      } else if (tool.name === 'Explore the Directory') {
+                           detailsLink = `<a href='#tools' class='text-indigo-600 hover:underline font-semibold nav-link-modal'>${tool.name}</a>`;
+                      }
+                      recommendation += `<li>${detailsLink}: <span class='text-sm text-gray-600'>${tool.reason}</span></li>`;
+                  });
+                  recommendation += "</ul>";
+                  recommendation += "<p class='text-sm text-gray-500 mt-4'>Also use the <a href='#comparison' class='text-indigo-600 hover:underline nav-link-modal'>Comparison Tool</a> for detailed analysis.</p>";
+                  recommendation += "</div>";
+
+                  showModal('Your AI Matchmaker Results', recommendation);
+             });
+
+              // Event Listener for links inside the Matchmaker results modal (delegated to modal)
+              modal.addEventListener('click', function(e) {
+                 if (e.target.classList.contains('view-details-matchmaker')) {
+                     e.preventDefault();
+                     handleViewDetails(e); // Reuse the existing details handler
+                  } else if (e.target.classList.contains('nav-link-modal')) {
+                      const hrefAttribute = e.target.getAttribute('href');
+                      if (hrefAttribute && hrefAttribute.startsWith('#')) {
+                          e.preventDefault();
+                          closeModal();
+                          const targetElement = document.querySelector(hrefAttribute);
+                          if (targetElement) {
+                              const navHeight = document.querySelector('nav').offsetHeight;
+                              const elementPosition = targetElement.getBoundingClientRect().top;
+                              const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+                              window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                          }
+                      }
+                  }
+              });
+
+
+             // --- Initialize filters on load ---
+             if (toolsGrid) filterAndSortTools();
+             if (newsGrid) filterAndSortNews();
+         });
+         document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-rating-widget .stars input');
+    const ratingText = document.getElementById('rating-text');
+    const ratingMessages = {
+        1: "Terrible - Not useful at all",
+        2: "Poor - Needs significant improvement",
+        3: "Average - Does the job but has flaws",
+        4: "Good - Works well with minor issues",
+        5: "Excellent - Exceeded all expectations"
+    };
+
+    // Handle star hover and selection
+    stars.forEach(star => {
+        star.addEventListener('change', function() {
+            const rating = this.value;
+            ratingText.textContent = ratingMessages[rating];
+            
+            // Reset all stars first
+            document.querySelectorAll('.star-rating-widget .stars label').forEach(label => {
+                label.style.transform = 'scale(1)';
+            });
+            
+            // Animate the selected star
+            if (this.checked) {
+                this.nextElementSibling.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.nextElementSibling.style.transform = 'scale(1)';
+                }, 300);
+            }
+        });
+        
+        star.addEventListener('mouseover', function() {
+            const rating = this.value;
+            ratingText.textContent = ratingMessages[rating];
+        });
+    });
+
+    // Form submission
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const review = {
+                rating: formData.get('rating'),
+                title: formData.get('title'),
+                content: formData.get('content'),
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            // In a real app, you would send this to your backend
+            console.log('Review submitted:', review);
+            
+            // Show success message
+            alert('Thank you for your review! Your feedback helps others make better decisions.');
+            
+            // Reset form
+            this.reset();
+            ratingText.textContent = 'Select rating';
+            
+            // Reset stars visually
+            document.querySelectorAll('.star-rating-widget .stars label').forEach(label => {
+                label.style.color = '#ddd';
+            });
+        });
+    }
+});
+
+     </script>
+ </body>
+ </html>
