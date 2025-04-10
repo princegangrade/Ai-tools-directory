@@ -1,0 +1,182 @@
+-- ==================================================
+-- == AI TOOLS DIRECTORY - SCHEMA & SEED DATA =====
+-- ==================================================
+
+-- Use IF NOT EXISTS for safer re-running
+
+-- PART 1: CREATE TABLES, FUNCTION, TRIGGERS
+-- =============================================
+
+-- Categories Table
+CREATE TABLE IF NOT EXISTS categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    slug VARCHAR(100) NOT NULL UNIQUE -- For URLs (e.g., 'text-generation')
+);
+
+-- Tools Table
+CREATE TABLE IF NOT EXISTS tools (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL UNIQUE, -- For URLs (e.g., 'claude-3-7-sonnet')
+    description TEXT,
+    website_url VARCHAR(512),
+    try_now_url VARCHAR(512), -- Could be same as website or affiliate link
+    image_url VARCHAR(512), -- Logo URL
+    pricing_text VARCHAR(100), -- e.g., "Free - $20/mo"
+    pricing_low NUMERIC(10, 2) DEFAULT 0, -- For sorting/filtering
+    pricing_high NUMERIC(10, 2), -- Can be NULL if single price or free
+    rating_avg NUMERIC(3, 2) DEFAULT 0, -- Calculated later from reviews
+    review_count INTEGER DEFAULT 0, -- Calculated later
+    tags_array TEXT[], -- Array of text tags like ['creative', 'code']
+    features_json JSONB, -- Store detailed features as JSON { "feature1": "desc", "api": true }
+    category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL, -- Reference categories table, handle deletion
+    submitted_by_user_id INTEGER, -- Placeholder for user reference
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('approved', 'pending', 'rejected')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- News Articles Table
+CREATE TABLE IF NOT EXISTS news_articles (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    content TEXT,
+    image_url VARCHAR(512),
+    category VARCHAR(50) CHECK (category IN ('release', 'trend', 'research', 'update', 'general')),
+    published_date DATE,
+    author VARCHAR(100),
+    status VARCHAR(20) DEFAULT 'published' CHECK (status IN ('published', 'draft')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Function to auto-update 'updated_at' timestamp (only create if it doesn't exist)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'trigger_set_timestamp') THEN
+        CREATE FUNCTION trigger_set_timestamp()
+        RETURNS TRIGGER AS $$
+        BEGIN
+          NEW.updated_at = NOW();
+          RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        RAISE NOTICE 'Function trigger_set_timestamp created or already exists.';
+    ELSE
+        RAISE NOTICE 'Function trigger_set_timestamp already exists, skipping creation.';
+    END IF;
+END $$;
+
+-- Trigger for 'tools' table (only create if it doesn't exist)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_tools' AND tgrelid = 'tools'::regclass) THEN
+        CREATE TRIGGER set_timestamp_tools
+        BEFORE UPDATE ON tools
+        FOR EACH ROW
+        EXECUTE FUNCTION trigger_set_timestamp();
+        RAISE NOTICE 'Trigger set_timestamp_tools created.';
+    ELSE
+         RAISE NOTICE 'Trigger set_timestamp_tools already exists, skipping creation.';
+    END IF;
+END $$;
+
+-- Trigger for 'news_articles' table (only create if it doesn't exist)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_news' AND tgrelid = 'news_articles'::regclass) THEN
+        CREATE TRIGGER set_timestamp_news
+        BEFORE UPDATE ON news_articles
+        FOR EACH ROW
+        EXECUTE FUNCTION trigger_set_timestamp();
+        RAISE NOTICE 'Trigger set_timestamp_news created.';
+    ELSE
+        RAISE NOTICE 'Trigger set_timestamp_news already exists, skipping creation.';
+    END IF;
+END $$;
+
+-- PART 2: INSERT INITIAL DATA
+-- =============================================
+-- Use ON CONFLICT DO NOTHING to avoid errors if data already exists
+
+-- Insert Categories
+INSERT INTO categories (name, slug) VALUES
+    ('Text AI', 'text-ai'),
+    ('Image AI', 'image-ai'),
+    ('Code AI', 'code-ai'),
+    ('Video AI', 'video-ai'),
+    ('Audio AI', 'audio-ai'),
+    ('Utility AI', 'utility-ai')
+ON CONFLICT (slug) DO NOTHING;
+
+-- Insert Tools (Ensure category IDs are correct based on above inserts: 1-6)
+INSERT INTO tools (name, slug, description, website_url, try_now_url, pricing_text, pricing_low, pricing_high, rating_avg, category_id, tags_array, status) VALUES
+    ('Claude 3.7 Sonnet', 'claude-3-7-sonnet', 'Advanced AI assistant with superior reasoning capabilities, ideal for complex tasks, research, and creative writing.', 'https://claude.ai/', 'https://claude.ai/', 'Free - $20/mo', 0.00, 20.00, 4.9, 1, ARRAY['Reasoning', 'Code', 'Creative', 'Research'], 'approved'),
+    ('Midjourney v6.5', 'midjourney-v6-5', 'State-of-the-art AI image generator capable of creating stunning, artistic images from text descriptions via Discord.', 'https://www.midjourney.com/', 'https://www.midjourney.com/', '$10 - $60/mo', 10.00, 60.00, 4.8, 2, ARRAY['Art', 'Design', 'Photorealistic', 'Discord'], 'approved'),
+    ('GitHub Copilot', 'github-copilot', 'AI pair programmer that helps you write code faster with smart autocomplete and full line & function suggestions.', 'https://github.com/features/copilot', 'https://github.com/features/copilot', 'Free (Students) - $10/mo', 0.00, 10.00, 4.7, 3, ARRAY['Coding', 'Developer', 'IDE'], 'approved'),
+    ('RunwayML', 'runwayml', 'AI-powered video editing and generation suite for creators, featuring text-to-video (Gen-2) and other magic tools.', 'https://runwayml.com/', 'https://runwayml.com/', 'Free - $35+/mo', 0.00, 35.00, 4.6, 4, ARRAY['Video Editing', 'Gen-2', 'Creative Suite'], 'approved'),
+    ('ChatGPT (3.5)', 'chatgpt-3-5', 'Highly popular conversational AI for generating text, answering questions, writing code, brainstorming, and more.', 'https://chatgpt.com/', 'https://chatgpt.com/', 'Free (GPT-3.5) / $20/mo (GPT-4)', 0.00, 20.00, 4.7, 1, ARRAY['Chatbot', 'Writing', 'Conversation', 'General Purpose'], 'approved'),
+    ('Google Gemini', 'google-gemini', 'Google''s powerful AI model for conversation, content creation, and multimodal understanding (text, images, code).', 'https://gemini.google.com/', 'https://gemini.google.com/', 'Free / $20/mo (Advanced)', 0.00, 20.00, 4.6, 1, ARRAY['Chatbot', 'Multimodal', 'Google Ecosystem', 'Research'], 'approved'),
+    ('Leonardo.Ai', 'leonardo-ai', 'Feature-rich platform for creating stunning AI art and images using various models (incl. Stable Diffusion) with a generous free tier.', 'https://leonardo.ai/', 'https://leonardo.ai/', 'Free (Daily Credits) - $12+/mo', 0.00, 12.00, 4.7, 2, ARRAY['Image Generation', 'Art', 'Stable Diffusion', 'Web UI'], 'approved'),
+    ('Suno AI', 'suno-ai', 'Generate original songs with vocals and instrumentation simply by providing text prompts for lyrics and style.', 'https://suno.ai/', 'https://suno.ai/', 'Free (Daily Credits) - $10+/mo', 0.00, 10.00, 4.6, 5, ARRAY['Music Generation', 'Song Creation', 'Vocals', 'Text-to-Music'], 'approved'),
+    ('Grammarly', 'grammarly', 'AI-powered writing assistant that checks grammar, spelling, punctuation, clarity, engagement, and delivery tones.', 'https://www.grammarly.com/', 'https://www.grammarly.com/', 'Free - $12+/mo (Premium)', 0.00, 12.00, 4.8, 6, ARRAY['Writing Assistant', 'Grammar', 'Clarity', 'Browser Extension'], 'approved'),
+    ('Phind', 'phind', 'AI search engine designed specifically for developers, providing code examples and explanations sourced from the web.', 'https://www.phind.com/', 'https://www.phind.com/', 'Free / $20/mo (Plus)', 0.00, 20.00, 4.5, 3, ARRAY['Developer Search', 'Code Examples', 'Debugging', 'Pair Programming'], 'approved')
+ON CONFLICT (slug) DO NOTHING;
+
+-- Insert News Articles
+INSERT INTO news_articles (title, slug, content, image_url, category, published_date, author, status) VALUES
+    ('Anthropic Releases Claude 3.7 Sonnet', 'anthropic-releases-claude-3-7-sonnet', 'Anthropic introduces a new version of Claude with improved reasoning capabilities, vision, and performance. This model aims to compete directly with top offerings while providing strong performance on benchmarks.', 'https://images.unsplash.com/photo-1677756119517-756a188d2d94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDEwfHxhaSUyMGxhdW5jaHxlbnwwfDB8fHwxNjgzNTU5ODUz&ixlib=rb-4.0.3&q=80&w=400', 'release', '2025-04-05', 'AI Tools Directory Staff', 'published'),
+    ('AI Video Tools Growth Explodes', 'ai-video-tools-growth-explodes', 'New report shows 300% growth in AI video tool adoption across creative industries. Tools like RunwayML, Pika Labs, and others are rapidly improving text-to-video capabilities.', 'https://images.unsplash.com/photo-1682002115004-91d79b809a17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDE1fHxhSSUyMHZpZGVvfGVufDB8MHx8fDE2ODM1NjAwMTk&ixlib=rb-4.0.3&q=80&w=400', 'trend', '2025-04-03', 'Maya Johnson', 'published'),
+    ('Breakthrough in Efficient Transformers', 'breakthrough-efficient-transformers', 'A new paper published on arXiv details a method called "Sparse Attention Projection" (SAP) to significantly reduce the computational cost of large language models during inference, potentially enabling larger models on consumer hardware.', 'https://images.unsplash.com/photo-1532187863486-abf9db5a9fed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDZ8fGFpJTIwcmVzZWFyY2h8ZW58MHwwfHx8MTY4MzU2MDEyOA&ixlib=rb-4.0.3&q=80&w=400', 'research', '2025-04-01', 'Dr. Evelyn Reed', 'published')
+ON CONFLICT (slug) DO NOTHING;
+
+-- Add a final message
+SELECT 'Schema creation and initial data seeding SQL block executed.';
+
+-- ==================================================
+-- == PHASE 2 SCHEMA UPDATES ========================
+-- ==================================================
+-- Creates 'users' and 'user_favorites' tables
+
+-- Users Table
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(100) NOT NULL, -- Store hashed password, not plain text
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Apply the updated_at trigger to users table (Assumes trigger_set_timestamp function already exists from Phase 1)
+DO $$
+BEGIN
+    -- Check if the trigger function exists before attempting to create the trigger
+    IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'trigger_set_timestamp') THEN
+        -- Check if the trigger itself already exists
+        IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_users' AND tgrelid = 'users'::regclass) THEN
+            CREATE TRIGGER set_timestamp_users
+            BEFORE UPDATE ON users
+            FOR EACH ROW
+            EXECUTE FUNCTION trigger_set_timestamp();
+            RAISE NOTICE 'Trigger set_timestamp_users created.';
+        ELSE
+            RAISE NOTICE 'Trigger set_timestamp_users already exists, skipping creation.';
+        END IF;
+    ELSE
+         RAISE NOTICE 'Function trigger_set_timestamp does not exist. Skipping trigger creation for users table.';
+    END IF;
+END $$;
+
+-- User Favorites Table (Many-to-Many relationship between users and tools)
+CREATE TABLE IF NOT EXISTS user_favorites (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- If user is deleted, remove their favorites
+    tool_id INTEGER NOT NULL REFERENCES tools(id) ON DELETE CASCADE, -- If tool is deleted, remove from favorites
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    PRIMARY KEY (user_id, tool_id) -- Ensure a user can only favorite a tool once
+);
+
+-- Add a simple message to confirm execution attempt
+SELECT 'Phase 2 Schema Update SQL block executed.';
