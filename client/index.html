@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Updated Title -->
+     <title>AI Tools Directory - The Ultimate AI Tool Directory</title>
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+         html {
+             scroll-behavior: smooth; /* Enable smooth scrolling for the whole page */
+         }
+
+         body {
+             font-family: 'Inter', sans-serif;
+             background-color: #f9fafb;
+         }
+
+         .gradient-text {
+             background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+             -webkit-background-clip: text;
+             background-clip: text;
+             color: transparent;
+         }
+
+         .card-hover:hover {
+             transform: translateY(-5px);
+             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
+         }
+
+         .feature-card {
+             transition: all 0.3s ease;
+         }
+
+         .feature-card:hover {
+             transform: translateY(-5px);
+         }
+
+         .tool-card {
+             transition: all 0.2s ease;
+         }
+         /* Add a base hidden style for filtering */
+         .tool-card.hidden, .news-card.hidden {
+            display: none;
+         }
+
+
+         .tool-card:hover {
+             transform: translateY(-3px);
+             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+         }
+
+         .news-card {
+             transition: all 0.2s ease;
+         }
+
+         .news-card:hover {
+             transform: translateY(-3px);
+             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+         }
+
+         .comparison-card {
+             transition: all 0.3s ease;
+         }
+
+         .modal {
+             display: none;
+             position: fixed;
+             z-index: 1000;
+             left: 0;
+             top: 0;
+             width: 100%;
+             height: 100%;
+             overflow: auto;
+             background-color: rgba(0,0,0,0.6); /* Darker background */
+             backdrop-filter: blur(3px); /* Optional: blur background */
+             animation: fadeIn 0.3s ease;
+         }
+
+         .modal-content {
+             background-color: #fefefe;
+             margin: 10% auto; /* Adjusted margin */
+             padding: 25px; /* Increased padding */
+             border: 1px solid #ddd; /* Softer border */
+             width: 90%; /* Responsive width */
+             max-width: 600px; /* Slightly wider for details */
+             border-radius: 12px; /* More rounded corners */
+             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+             animation: slideIn 0.3s ease;
+             max-height: 80vh; /* Limit height */
+             overflow-y: auto; /* Allow scrolling within modal */
+         }
+
+         /* Specific width for auth forms */
+         .modal-content.auth-modal {
+            max-width: 500px;
+         }
+
+
+         .close {
+             color: #aaa;
+             float: right;
+             font-size: 32px; /* Larger close button */
+             line-height: 1;
+             font-weight: bold;
+             transition: color 0.2s ease;
+             position: sticky; /* Make close button stick */
+             top: 10px; /* Adjust position as needed */
+             right: 15px;
+             z-index: 1001; /* Ensure it's above content */
+         }
+
+         .close:hover,
+         .close:focus {
+             color: #333; /* Darker hover */
+             text-decoration: none;
+             cursor: pointer;
+         }
+
+         /* Modal Animations */
+         @keyframes fadeIn {
+             from {opacity: 0;}
+             to {opacity: 1;}
+         }
+
+         @keyframes slideIn {
+             from {transform: translateY(-30px); opacity: 0;}
+             to {transform: translateY(0); opacity: 1;}
+         }
+
+         /* Active state for filter buttons */
+         .filter-button-active {
+             background-color: #4f46e5 !important; /* Use !important carefully */
+             color: white !important;
+             border-color: #4f46e5 !important;
+         }
+         .filter-button-inactive {
+             background-color: white;
+             border: 1px solid #d1d5db; /* gray-300 */
+             color: #374151; /* gray-700 */
+         }
+         .filter-button-inactive:hover {
+              background-color: #f9fafb; /* gray-50 */
+         }
+
+         /* Style for links within modal forms */
+        .modal-form-link {
+             cursor: pointer;
+             color: #4f46e5; /* indigo-600 */
+             font-weight: 500;
+        }
+        .modal-form-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Tailwind Prose styles for modal news content */
+        .prose { color: #374151; /* gray-700 */ line-height: 1.65; }
+        .prose :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) { margin-top: 1.25em; margin-bottom: 1.25em; }
+        .prose :where(h1,h2,h3,h4,h5,h6):not(:where([class~="not-prose"], [class~="not-prose"] *)) { color: #111827; /* gray-900 */ font-weight: 600; margin-top: 1.6em; margin-bottom: 0.6em; }
+        .prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) { font-size: 1.25em; }
+        .prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) { font-size: 1.125em; }
+        .prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) { color: #4f46e5; /* indigo-600 */ text-decoration: underline; font-weight: 500; }
+        .prose :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) { color: #111827; /* gray-900 */ font-weight: 600; }
+        .prose :where(ul):not(:where([class~="not-prose"], [class~="not-prose"] *)) { list-style-type: disc; margin-top: 1.25em; margin-bottom: 1.25em; padding-left: 1.625em; }
+        .prose :where(li):not(:where([class~="not-prose"], [class~="not-prose"] *)) { margin-top: 0.5em; margin-bottom: 0.5em; }
+        .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) { background-color: #e5e7eb; /* gray-200 */ padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; font-family: monospace; }
+        /* Add more prose styles as needed */
+
+     </style>
+ </head>
+ <body class="antialiased"> <!-- Added antialiased for better font rendering -->
+     <!-- Navigation -->
+ <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex">
+                <!-- Logo/Title -->
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold gradient-text">AI Tools Directory</span>
+                </div>
+                <!-- Desktop Nav Links -->
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <a href="#home" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">Home</a>
+                    <a href="#tools" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">Tools</a>
+                    <a href="#comparison" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">Compare</a>
+                    <a href="#news" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">News</a>
+                    <a href="#matchmaker" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium nav-link">AI Matchmaker</a>
+                </div>
+            </div>
+
+            <!-- Desktop Auth Area (Right Side) -->
+            <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                <!-- Desktop Auth Status Container -->
+                <div id="authStatusContainer" class="ml-3 relative flex items-center">
+                    <!-- Initial placeholder button - JS will replace this innerHTML -->
+                    <button id="signInBtnDesktopPlaceholder" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">
+                        Sign In / Sign Up
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="-mr-2 flex items-center sm:hidden">
+              <button type="button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false" id="mobileMenuBtn">
+                <span class="sr-only">Open main menu</span>
+                <i class="fas fa-bars text-lg"></i> <!-- Hamburger icon -->
+              </button>
+            </div>
+        </div>
+    </div>
+
+     <!-- === THIS IS THE CORRECT MOBILE MENU WRAPPER === -->
+     <!-- Mobile menu, show/hide based on menu state. -->
+     <div class="sm:hidden hidden" id="mobile-menu">
+        <div class="pt-2 pb-3 space-y-1">
+          <!-- Mobile nav links -->
+          <a href="#home" class="block pl-3 pr-4 py-2 border-l-4 border-indigo-500 text-base font-medium text-indigo-700 bg-indigo-50 nav-link">Home</a>
+          <a href="#tools" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 nav-link">Tools</a>
+          <a href="#comparison" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 nav-link">Compare</a>
+          <a href="#news" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 nav-link">News</a>
+          <a href="#matchmaker" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 nav-link">AI Matchmaker</a>
+        </div>
+
+        <!-- Mobile Auth Status Container (CORRECTLY PLACED INSIDE #mobile-menu) -->
+        <div id="authStatusContainerMobile" class="pt-4 pb-3 border-t border-gray-200 px-4">
+            <!-- Initial placeholder button - JS will replace this innerHTML -->
+            <button id="signInBtnMobilePlaceholder" class="w-full text-left block py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-md text-center border border-gray-300">
+                Sign In / Sign Up
+            </button>
+        </div>
+      </div>
+      <!-- === END OF CORRECT MOBILE MENU WRAPPER === -->
+</nav>
+     <!-- Hero Section -->
+     <section id="home" class="py-12 bg-white">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="lg:flex lg:items-center lg:justify-between">
+                 <div class="lg:w-1/2">
+                     <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                         <span class="block">Find the perfect</span>
+                         <span class="block gradient-text">AI tool for your needs</span>
+                     </h1>
+                     <p class="mt-3 max-w-md mx-auto text-lg text-gray-500 sm:text-xl md:mt-5 md:max-w-3xl">
+                         The most comprehensive directory of AI tools with interactive comparisons, real-time news, and personalized recommendations.
+                     </p>
+                     <div class="mt-10 sm:flex">
+                         <div class="rounded-md shadow">
+                             <a href="#matchmaker" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 md:py-4 md:text-lg md:px-10 nav-link">
+                                 Find Your AI Tool
+                             </a>
+                         </div>
+                         <div class="mt-3 sm:mt-0 sm:ml-3">
+                             <a href="#tools" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 nav-link">
+                                 Browse Directory
+                             </a>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="mt-10 lg:mt-0 lg:w-1/2">
+                     <div class="relative">
+                         <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-indigo-100 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+                         <div class="relative bg-white p-6 sm:p-10 shadow-xl rounded-3xl">
+                             <div class="flex items-center justify-between mb-8">
+                                 <div>
+                                     <h2 class="text-xl font-bold text-gray-900">Top Trending AI Tools</h2>
+                                     <p class="text-sm text-gray-500">Updated hourly</p>
+                                 </div>
+                                 <div>
+                                     <!-- Added ID for JS interaction -->
+                                     <select id="heroCategorySelect" class="text-sm text-gray-500 border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                         <option>All Categories</option>
+                                         <option>Text Generation</option>
+                                         <option>Image Generation</option>
+                                         <option>Code Assistants</option>
+                                         <!-- Added New Category -->
+                                         <option>Audio & Music</option>
+                                     </select>
+                                 </div>
+                             </div>
+                             <!-- Hero trending tools will remain static for now, not linked to API -->
+                             <div class="space-y-4">
+                                 <!-- Static trending tools list -->
+                                 <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50 tool-card">
+                                     <div class="flex items-center">
+                                         <div class="bg-blue-100 rounded-md p-2 mr-4"> <i class="fas fa-robot text-blue-500"></i> </div>
+                                         <div> <h3 class="font-medium">Claude 3.7 Sonnet</h3> <p class="text-sm text-gray-500">Text & Reasoning</p> </div>
+                                     </div>
+                                     <div class="flex items-center"> <div class="text-sm font-medium text-gray-900 mr-2">4.9</div> <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i> </div> </div>
+                                 </div>
+                                 <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50 tool-card">
+                                     <div class="flex items-center"> <div class="bg-purple-100 rounded-md p-2 mr-4"> <i class="fas fa-palette text-purple-500"></i> </div> <div> <h3 class="font-medium">Midjourney v6.5</h3> <p class="text-sm text-gray-500">Image Generation</p> </div> </div>
+                                     <div class="flex items-center"> <div class="text-sm font-medium text-gray-900 mr-2">4.8</div> <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star-half-alt text-yellow-400"></i> </div> </div>
+                                 </div>
+                                 <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50 tool-card">
+                                     <div class="flex items-center"> <div class="bg-green-100 rounded-md p-2 mr-4"> <i class="fas fa-code text-green-500"></i> </div> <div> <h3 class="font-medium">GitHub Copilot</h3> <p class="text-sm text-gray-500">Code Assistant</p> </div> </div>
+                                     <div class="flex items-center"> <div class="text-sm font-medium text-gray-900 mr-2">4.7</div> <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star-half-alt text-yellow-400"></i> </div> </div>
+                                 </div>
+                                 <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50 tool-card">
+                                     <div class="flex items-center"> <div class="bg-yellow-100 rounded-md p-2 mr-4"> <i class="fas fa-music text-yellow-600"></i> </div> <div> <h3 class="font-medium">Suno AI</h3> <p class="text-sm text-gray-500">Music Generation</p> </div> </div>
+                                     <div class="flex items-center"> <div class="text-sm font-medium text-gray-900 mr-2">4.6</div> <div class="flex items-center"> <i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star text-yellow-400"></i><i class="fas fa-star-half-alt text-yellow-400"></i> </div> </div>
+                                 </div>
+                             </div>
+                             <div class="mt-6 text-center">
+                                 <a href="#tools" class="text-indigo-600 hover:text-indigo-500 text-sm font-medium nav-link">
+                                     View all tools <i class="fas fa-arrow-right ml-1"></i>
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </section>
+
+     <!-- Stats Section -->
+     <section class="bg-indigo-800 py-10">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="grid grid-cols-2 gap-4 md:grid-cols-4 text-center">
+                 <!-- Stats remain static for now -->
+                 <div class="bg-indigo-700 rounded-lg p-6">
+                     <div class="text-4xl font-bold text-white" data-target="1250">0+</div>
+                     <div class="text-indigo-200 mt-1">AI Tools</div>
+                 </div>
+                 <div class="bg-indigo-700 rounded-lg p-6">
+                     <div class="text-4xl font-bold text-white" data-target="40">0+</div>
+                     <div class="text-indigo-200 mt-1">Categories</div>
+                 </div>
+                 <div class="bg-indigo-700 rounded-lg p-6">
+                     <div class="text-4xl font-bold text-white" data-target="25000">0+</div>
+                     <div class="text-indigo-200 mt-1">User Reviews</div>
+                 </div>
+                 <div class="bg-indigo-700 rounded-lg p-6">
+                     <div class="text-4xl font-bold text-white">Daily</div>
+                     <div class="text-indigo-200 mt-1">Updates</div>
+                 </div>
+             </div>
+         </div>
+     </section>
+
+     <!-- Features Section -->
+     <section class="py-12 bg-gray-50">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="text-center">
+                 <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl"> Features that set us apart </h2>
+                 <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500"> Discover AI tools like never before with our unique interactive features. </p>
+             </div>
+             <div class="mt-10">
+                 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                     <!-- Features remain static -->
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-blue-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-exchange-alt text-blue-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Dynamic Comparisons</h3> <p class="mt-2 text-gray-500"> Compare up to 4 AI tools side-by-side with interactive feature matrices and visual differentiators. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-purple-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-user-check text-purple-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">AI Matchmaker Quiz</h3> <p class="mt-2 text-gray-500"> Find your perfect AI tool match through our interactive questionnaire based on your needs and skills. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-green-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-newspaper text-green-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Real-time AI News</h3> <p class="mt-2 text-gray-500"> Stay updated with curated news about AI advancements, new releases, and industry trends. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-yellow-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-chart-line text-yellow-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Performance Benchmarks</h3> <p class="mt-2 text-gray-500"> View standardized comparison metrics for similar AI models to understand performance differences. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-red-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-tasks text-red-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Use Case Scenarios</h3> <p class="mt-2 text-gray-500"> Interactive demos showing how different tools solve common problems in various industries. </p> </div>
+                     <div class="bg-white rounded-lg shadow-md p-6 feature-card"> <div class="bg-indigo-100 p-2 rounded-full w-12 h-12 flex items-center justify-center mb-4"> <i class="fas fa-calendar-alt text-indigo-600 text-xl"></i> </div> <h3 class="text-lg font-medium text-gray-900">Release Calendar</h3> <p class="mt-2 text-gray-500"> Track upcoming AI tool releases and beta access opportunities all in one place. </p> </div>
+                 </div>
+             </div>
+         </div>
+     </section>
+
+     <!-- Tools Directory Section -->
+     <section id="tools" class="py-12 bg-white">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-8"> AI Tools Directory </h2>
+             <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+                 <!-- Filters -->
+                 <div class="flex flex-wrap gap-2" id="toolFilterButtons">
+                      <!-- Buttons remain, JS will handle active state -->
+                     <button data-filter="all" class="filter-button-active px-4 py-2 rounded-md text-sm font-medium">All</button>
+                     <button data-filter="text-ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Text Generation</button>
+                     <button data-filter="image-ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Image Generation</button>
+                     <button data-filter="code-ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Code Assistants</button>
+                     <button data-filter="video-ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Video Generation</button>
+                     <button data-filter="audio-ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Audio & Music</button>
+                     <button data-filter="utility-ai" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Utility & Other</button>
+                 </div>
+                 <!-- Search and Sort -->
+                 <div class="flex items-center flex-wrap gap-4">
+                     <div class="relative">
+                         <input type="text" id="toolSearchInput" placeholder="Search tools..." class="border border-gray-300 rounded-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                         <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                     </div>
+                     <div class="ml-0 sm:ml-4 relative">
+                         <select id="toolSortSelect" class="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none pr-8">
+                             <option value="popularity">Sort by: Popularity</option>
+                             <option value="rating">Sort by: Rating</option>
+                             <option value="newest">Sort by: Newest</option>
+                             <option value="price_asc">Sort by: Price (Low to High)</option>
+                         </select>
+                          <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Tool Grid - This will be populated by JavaScript -->
+             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" id="toolsGrid">
+                 <!-- JS will insert tool cards here -->
+                 <!-- Example structure (removed actual content) -->
+                 <!-- <div class="bg-white rounded-lg border ... tool-card"> ... </div> -->
+             </div>
+
+             <!-- Load More Tools Button -->
+             <div class="mt-8 text-center">
+                 <button id="loadMoreTools" class="px-6 py-3 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">
+                     Load More Tools <i class="fas fa-chevron-down ml-2"></i>
+                 </button>
+                  <p id="no-more-tools" class="text-gray-500 mt-4 hidden">No more tools to load.</p>
+             </div>
+         </div>
+     </section>
+
+     <!-- Comparison Tool Section -->
+     <section id="comparison" class="py-12 bg-gray-50">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-8"> Compare AI Tools </h2>
+             <p class="text-xl text-gray-500 mb-10 max-w-3xl"> Make an informed decision by comparing features, pricing, and performance of different AI tools side by side. </p>
+             <div class="bg-white shadow rounded-lg overflow-hidden">
+                 <div class="p-6">
+                     <div class="mb-6">
+                         <h3 class="text-lg font-medium text-gray-900 mb-4">Select tools to compare (up to 4)</h3>
+                         <div class="flex flex-wrap gap-4 items-center">
+                             <!-- Dropdowns will be populated by JS -->
+                             <div class="relative">
+                                 <select class="compare-select border border-gray-300 rounded-lg px-4 py-2 w-64 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                     <option value="">Select AI Tool 1</option>
+                                     <!-- Options added by JS -->
+                                 </select>
+                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                             </div>
+                             <div class="relative">
+                                 <select class="compare-select border border-gray-300 rounded-lg px-4 py-2 w-64 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                      <option value="">Select AI Tool 2</option>
+                                      <!-- Options added by JS -->
+                                 </select>
+                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                             </div>
+                             <div class="relative">
+                                 <select class="compare-select border border-gray-300 rounded-lg px-4 py-2 w-64 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                      <option value="">Select AI Tool 3 (Optional)</option>
+                                      <!-- Options added by JS -->
+                                 </select>
+                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                             </div>
+                              <div class="relative">
+                                 <select class="compare-select border border-gray-300 rounded-lg px-4 py-2 w-64 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                      <option value="">Select AI Tool 4 (Optional)</option>
+                                      <!-- Options added by JS -->
+                                 </select>
+                                 <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                             </div>
+                             <button id="compareBtn" class="bg-indigo-600 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"> Compare </button>
+                         </div>
+                     </div>
+
+                     <!-- Comparison Results Area -->
+                     <div id="comparisonResults" class="hidden">
+                         <div class="overflow-x-auto mb-10">
+                             <table class="min-w-full divide-y divide-gray-200" id="comparisonTable">
+                                 <thead class="bg-gray-50">
+                                     <tr>
+                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10"> Features </th>
+                                         <!-- Tool name headers added by JS -->
+                                     </tr>
+                                 </thead>
+                                 <tbody class="bg-white divide-y divide-gray-200">
+                                     <!-- Feature rows added by JS -->
+                                 </tbody>
+                             </table>
+                         </div>
+                         <div class="mt-10">
+                             <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Benchmark</h3>
+                             <div class="w-full h-80 bg-white rounded-lg p-4 border border-gray-200">
+                                 <canvas id="performanceChart"></canvas>
+                             </div>
+                         </div>
+                     </div>
+                     <!-- Placeholder shown initially -->
+                      <p id="comparisonPlaceholder" class="text-gray-500 text-center py-10">Select at least two tools and click 'Compare' to see results.</p>
+                 </div>
+             </div>
+         </div>
+     </section>
+
+     <!-- AI News Section -->
+     <section id="news" class="py-12 bg-white">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-6"> AI News & Updates </h2>
+             <p class="text-xl text-gray-500 mb-10 max-w-3xl"> Stay informed with the latest AI advancements, tool releases, and industry trends. </p>
+             <div class="mb-8">
+                 <div class="flex flex-wrap items-center justify-between gap-4">
+                     <!-- Filters -->
+                     <div class="flex flex-wrap gap-2" id="newsFilterButtons">
+                         <button data-filter="all" class="filter-button-active px-4 py-2 rounded-md text-sm font-medium">All News</button>
+                         <button data-filter="release" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Release Updates</button>
+                         <button data-filter="trend" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Industry Trends</button>
+                         <button data-filter="research" class="filter-button-inactive px-4 py-2 rounded-md text-sm font-medium">Research Papers</button>
+                     </div>
+                     <!-- Sort -->
+                     <div class="relative">
+                         <select id="newsSortSelect" class="border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none pr-8">
+                             <option value="latest">Sort by: Latest</option>
+                             <option value="most_read">Sort by: Most Read</option>
+                             <option value="featured">Sort by: Featured</option>
+                         </select>
+                         <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- News Grid - Populated by JavaScript -->
+             <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3" id="newsGrid">
+                 <!-- JS will insert news cards here -->
+             </div>
+
+             <!-- Load More News Button -->
+             <div class="mt-8 text-center">
+                 <button id="loadMoreNews" class="px-6 py-3 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors hidden">
+                     Load More News <i class="fas fa-chevron-down ml-2"></i>
+                 </button>
+                 <p id="no-more-news" class="text-gray-500 mt-4 hidden">No more news articles to load.</p>
+             </div>
+         </div>
+     </section>
+
+     <!-- AI Matchmaker Section -->
+     <section id="matchmaker" class="py-12 bg-gray-50">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+             <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-8"> AI Matchmaker Quiz </h2>
+             <p class="text-xl text-gray-500 mb-10 max-w-3xl"> Answer a few questions to find the perfect AI tool for your needs. </p>
+             <div class="bg-white shadow rounded-lg p-6 sm:p-8">
+                 <form id="matchmakerForm">
+                     <div class="mb-6">
+                         <label for="useCaseSelect" class="block text-lg font-medium text-gray-900 mb-2">What’s your primary use case?</label>
+                         <div class="relative">
+                              <select id="useCaseSelect" class="border border-gray-300 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none">
+                                 <option value="">Select an option</option>
+                                 <option value="Text Generation">Text Generation (Writing, Summarizing)</option>
+                                 <option value="Image Creation">Image Creation (Art, Design)</option>
+                                 <option value="Coding Assistance">Coding Assistance (Development)</option>
+                                 <option value="Video Generation">Video Generation/Editing</option>
+                                 <option value="Audio Creation">Audio & Music Creation</option>
+                                 <option value="Writing Improvement">Writing Improvement (Grammar, Style)</option>
+                             </select>
+                             <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
+                         </div>
+                     </div>
+                     <div class="mb-6">
+                         <label for="budgetSelect" class="block text-lg font-medium text-gray-900 mb-2">What’s your budget?</label>
+                          <div class="relative">
+                             <select id="budgetSelect" class="border border-gray-300 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none">
+                                 <option value="">Select an option</option>
+                                 <option value="Free">Free Tools Only</option>
+                                 <option value="Low">Up to $20/month</option>
+                                 <option value="Mid">$20 - $50/month</option>
+                                 <option value="High">$50+/month or Enterprise</option>
+                             </select>
+                             <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
+                         </div>
+                     </div>
+                      <div class="mb-8">
+                         <label for="skillLevelSelect" class="block text-lg font-medium text-gray-900 mb-2">What's your technical skill level?</label>
+                          <div class="relative">
+                             <select id="skillLevelSelect" class="border border-gray-300 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none">
+                                 <option value="">Select an option</option>
+                                 <option value="Beginner">Beginner (Easy to use interface preferred)</option>
+                                 <option value="Intermediate">Intermediate (Comfortable with some options)</option>
+                                 <option value="Advanced">Advanced (Need power features/API access)</option>
+                             </select>
+                             <i class="fas fa-chevron-down absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
+                         </div>
+                     </div>
+                     <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-md text-base font-medium hover:opacity-90 transition-opacity">
+                         <i class="fas fa-magic mr-2"></i> Find My Match
+                     </button>
+                 </form>
+             </div>
+         </div>
+     </section>
+
+      <!-- Footer -->
+     <footer class="bg-gray-800 text-gray-300 py-8">
+         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+             <p>&copy; 2025 AI Tools Directory. All rights reserved.</p>
+             <p class="text-sm mt-2">Your guide to the world of Artificial Intelligence tools.</p>
+             <p class="text-sm mt-2">Developed by team Noah.❤️</p>
+             <div class="mt-4 space-x-6">
+                 <a href="#" class="hover:text-white">About</a>
+                 <a href="#" class="hover:text-white">Contact</a>
+                 <a href="#" class="hover:text-white">Privacy Policy</a>
+             </div>
+         </div>
+     </footer>
+
+
+     <!-- Modal Structure -->
+     <div id="detailsModal" class="modal">
+         <div class="modal-content"> <!-- JS might add 'auth-modal' class here -->
+             <span class="close" id="modalCloseBtn">&times;</span>
+             <h2 id="modalTitle" class="text-2xl font-bold mb-4 text-gray-800 text-center"></h2>
+             <div id="modalBody" class="text-gray-600 leading-relaxed">
+                 <!-- Modal content injected by JS -->
+             </div>
+         </div>
+     </div>
+
+     <!-- JavaScript -->
+     <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+           // --- Configuration ---
+           const API_BASE_URL = 'http://localhost:3001/api'; // CHANGE PORT IF NEEDED
+
+           // --- Global State Variables ---
+           let allToolCards = []; // Holds DOM elements of tool cards currently shown
+           let allNewsCards = []; // Holds DOM elements of news cards currently shown
+           let toolsCurrentPage = 1;
+           let newsCurrentPage = 1;
+           let totalToolPages = 1;
+           let totalNewsPages = 1;
+           let currentPerformanceChart = null; // For the comparison chart
+
+           // --- DOM Element References ---
+           const modal = document.getElementById('detailsModal');
+           const modalContentElement = modal?.querySelector('.modal-content'); // Reference modal content
+           const modalTitle = document.getElementById('modalTitle');
+           const modalBody = document.getElementById('modalBody');
+           const modalCloseBtn = document.getElementById('modalCloseBtn');
+           const toolsGrid = document.getElementById('toolsGrid');
+           const newsGrid = document.getElementById('newsGrid');
+           const loadMoreToolsBtn = document.getElementById('loadMoreTools');
+           const loadMoreNewsBtn = document.getElementById('loadMoreNews');
+           const noMoreToolsMsg = document.getElementById('no-more-tools');
+           const noMoreNewsMsg = document.getElementById('no-more-news');
+           const toolFilterButtonsContainer = document.getElementById('toolFilterButtons');
+           const toolSearchInput = document.getElementById('toolSearchInput');
+           const toolSortSelect = document.getElementById('toolSortSelect');
+           const newsFilterButtonsContainer = document.getElementById('newsFilterButtons');
+           const newsSortSelect = document.getElementById('newsSortSelect');
+           const compareSelects = document.querySelectorAll('#comparison .compare-select');
+           const compareBtn = document.getElementById('compareBtn');
+           const comparisonResultsDiv = document.getElementById('comparisonResults');
+           const comparisonTable = document.getElementById('comparisonTable');
+           const comparisonPlaceholder = document.getElementById('comparisonPlaceholder');
+           const performanceChartCanvas = document.getElementById('performanceChart');
+           const matchmakerForm = document.getElementById('matchmakerForm');
+           const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+           const mobileMenu = document.getElementById('mobile-menu');
+           // const signInBtn = document.getElementById('signInBtn'); // No longer static refs needed
+           // const signInBtnMobile = document.getElementById('signInBtnMobile'); // No longer static refs needed
+           const heroCategorySelect = document.getElementById('heroCategorySelect');
+
+           // --- NEW: References to Auth Status Containers ---
+           const authStatusContainer = document.getElementById('authStatusContainer');
+           const authStatusContainerMobile = document.getElementById('authStatusContainerMobile');
+
+            // Define auth form contents outside the function so they can be reused
+           const signInContentHTML = `
+               <form id="signInForm">
+                   <div class="mb-4"> <label for="signInEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label> <input type="email" id="signInEmail" name="email" placeholder="you@example.com" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required> </div>
+                   <div class="mb-6"> <label for="signInPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label> <input type="password" id="signInPassword" name="password" placeholder="••••••••" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required> <a href="#" class="text-xs text-indigo-600 hover:underline mt-1 block text-right modal-form-link">Forgot password?</a> </div>
+                   <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition-opacity"> Sign In </button>
+                   <p class="text-center text-sm text-gray-500 mt-4"> Don't have an account? <a href="#" class="modal-form-link switch-to-signup">Sign up</a> </p>
+               </form> `; // Removed demo text as it's now functional
+
+           const signUpContentHTML = `
+               <form id="signUpForm">
+                   <div class="mb-4"> <label for="signUpName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label> <input type="text" id="signUpName" name="name" placeholder="Your Name" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required> </div>
+                   <div class="mb-4"> <label for="signUpEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label> <input type="email" id="signUpEmail" name="email" placeholder="you@example.com" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required> </div>
+                   <div class="mb-4"> <label for="signUpPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label> <input type="password" id="signUpPassword" name="password" placeholder="Create a password (min 6 chars)" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required minlength="6"> </div>
+                   <div class="mb-6"> <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label> <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required> </div>
+                   <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-md font-medium hover:opacity-90 transition-opacity"> Create Account </button>
+                   <p class="text-center text-sm text-gray-500 mt-4"> Already have an account? <a href="#" class="modal-form-link switch-to-signin">Sign in</a> </p>
+               </form> `; // Removed demo text
+
+           // --- Initial Setup ---
+
+           // Clear static placeholders if any
+           if (toolsGrid) toolsGrid.innerHTML = '';
+           if (newsGrid) newsGrid.innerHTML = '';
+
+           // Fetch and render initial data when the page loads
+           await fetchAndRenderInitialData();
+
+           // Setup non-data-dependent UI interactions
+           setupModal();
+           setupSmoothScrolling();
+           setupMobileMenu();
+           setupFilterSortListeners();
+           initializeStatsAnimation(); // Assumes IntersectionObserver is set up
+           setupMatchmakerForm();
+           setupNewsGridDelegation(); // For handling clicks on news items
+           setupHeroCategorySelect(); // Setup hero filter interaction
+           setupComparisonTool(); // Setup comparison button listener
+           setupLoadMoreButtons(); // Setup load more button listeners
+           setupAuthModals(); // Setup sign in/up buttons (now just defines function)
+
+           // --- NEW: Update UI on Initial Load ---
+           updateAuthUI(); // Check login state when page loads
+
+           console.log("AI Tools Directory Frontend Initialized");
+
+
+           // ==================================================
+           // == AUTH UI FUNCTIONS (NEW)
+           // ==================================================
+
+           function updateAuthUI() {
+               const token = localStorage.getItem('authToken');
+               const userName = localStorage.getItem('userName');
+
+               if (token && userName) {
+                   // --- USER IS LOGGED IN ---
+                   console.log(`Updating UI for logged-in user: ${userName}`);
+
+                   // Desktop View
+                   if (authStatusContainer) {
+                       authStatusContainer.innerHTML = `
+                           <span class="text-sm text-gray-700 mr-3 hidden md:inline">Welcome, ${userName}!</span>
+                           <button id="logoutBtnDesktop" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors">
+                               Logout
+                           </button>
+                       `;
+                       // Add listener to the newly created button
+                       authStatusContainer.querySelector('#logoutBtnDesktop')?.addEventListener('click', handleLogout);
+                   }
+
+                   // Mobile View
+                   if (authStatusContainerMobile) {
+                        authStatusContainerMobile.innerHTML = `
+                           <div class="text-center mb-2">
+                               <span class="text-base font-medium text-gray-800 block">Welcome, ${userName}!</span>
+                           </div>
+                           <button id="logoutBtnMobile" class="w-full bg-red-100 text-red-700 px-4 py-2 rounded-md text-base font-medium hover:bg-red-200 transition-colors border border-red-200">
+                               Logout
+                           </button>
+                       `;
+                       // Add listener to the newly created button
+                        authStatusContainerMobile.querySelector('#logoutBtnMobile')?.addEventListener('click', handleLogout);
+                   }
+
+               } else {
+                   // --- USER IS LOGGED OUT ---
+                   console.log('Updating UI for logged-out user.');
+
+                   // Desktop View
+                   if (authStatusContainer) {
+                        authStatusContainer.innerHTML = `
+                           <button id="signInBtnDesktop" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">
+                               Sign In / Sign Up
+                           </button>
+                       `;
+                       // Add listener to the newly created button
+                       authStatusContainer.querySelector('#signInBtnDesktop')?.addEventListener('click', showAuthModal);
+                   }
+
+                   // Mobile View
+                   if (authStatusContainerMobile) {
+                        authStatusContainerMobile.innerHTML = `
+                            <button id="signInBtnMobile" class="w-full text-left block py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-md text-center border border-gray-300">
+                                Sign In / Sign Up
+                            </button>
+                       `;
+                        // Add listener to the newly created button
+                        authStatusContainerMobile.querySelector('#signInBtnMobile')?.addEventListener('click', () => {
+                            closeMobileMenu(); // Close menu first
+                            showAuthModal();
+                        });
+                   }
+               }
+           }
+
+           function handleLogout() {
+               console.log('Logging out user...');
+               // Remove user info from storage
+               localStorage.removeItem('authToken');
+               localStorage.removeItem('userName');
+
+               // Update the UI to show the logged-out state
+               updateAuthUI();
+
+               // Optional: Show a logged out message (could use the modal temporarily)
+               showModal('Logged Out', '<p>You have been successfully logged out.</p>');
+               setTimeout(closeModal, 1500);
+           }
+
+
+           // ==================================================
+           // == FETCHING & RENDERING FUNCTIONS
+           // ==================================================
+
+           async function fetchAndRenderInitialData() {
+               console.log('Fetching initial data...');
+               showLoadingState('tools', true);
+               showLoadingState('news', true);
+
+               try {
+               // Fetch initial tools (page 1, limit 9)
+               const toolResponse = await fetch(`${API_BASE_URL}/tools?limit=9`);
+               if (!toolResponse.ok) throw new Error(`Tool Fetch Error! Status: ${toolResponse.status}`);
+               const toolData = await toolResponse.json();
+               console.log('Initial Tool data received:', toolData);
+
+               // Fetch initial news (page 1, limit 3)
+               const newsResponse = await fetch(`${API_BASE_URL}/news?limit=3`);
+               if (!newsResponse.ok) throw new Error(`News Fetch Error! Status: ${newsResponse.status}`);
+               const newsData = await newsResponse.json();
+               console.log('Initial News data received:', newsData);
+
+               showLoadingState('tools', false);
+               showLoadingState('news', false);
+
+               // --- Render Tools ---
+               if (toolsGrid && toolData.tools && toolData.tools.length > 0) {
+                   const toolFragment = document.createDocumentFragment();
+                   toolData.tools.forEach(tool => {
+                   const toolCard = createToolCardFromData(tool);
+                   if (toolCard) toolFragment.appendChild(toolCard);
+                   });
+                   toolsGrid.appendChild(toolFragment);
+
+                   allToolCards = Array.from(toolsGrid.querySelectorAll('.tool-card'));
+                   toolsCurrentPage = toolData.pagination?.currentPage || 1;
+                   totalToolPages = toolData.pagination?.totalPages || 1;
+
+                   attachAllToolCardEvents(toolsGrid); // Attach events AFTER rendering
+                   updateLoadMoreButton('tools', toolsCurrentPage, totalToolPages);
+                   populateCompareSelects(toolData.tools); // Populate dropdowns with initial tools
+                   filterAndSortTools(); // Apply initial client-side filter/sort if needed
+                   console.log(`Rendered ${toolData.tools.length} tools. Total pages: ${totalToolPages}`);
+               } else {
+                   if (toolsGrid) toolsGrid.innerHTML = '<p class="text-gray-500 col-span-full text-center py-10">No tools found matching criteria.</p>';
+                   updateLoadMoreButton('tools', 1, 1);
+               }
+
+               // --- Render News ---
+               if (newsGrid && newsData.news && newsData.news.length > 0) {
+                   const newsFragment = document.createDocumentFragment();
+                   newsData.news.forEach(article => {
+                   const newsCard = createNewsCardFromData(article);
+                   if (newsCard) newsFragment.appendChild(newsCard);
+                   });
+                   newsGrid.appendChild(newsFragment);
+
+                   allNewsCards = Array.from(newsGrid.querySelectorAll('.news-card'));
+                   newsCurrentPage = newsData.pagination?.currentPage || 1;
+                   totalNewsPages = newsData.pagination?.totalPages || 1;
+
+                   updateLoadMoreButton('news', newsCurrentPage, totalNewsPages);
+                   filterAndSortNews(); // Apply initial client-side filter/sort if needed
+                   console.log(`Rendered ${newsData.news.length} news articles. Total pages: ${totalNewsPages}`);
+               } else {
+                   if (newsGrid) newsGrid.innerHTML = '<p class="text-gray-500 col-span-full text-center py-10">No news found.</p>';
+                   updateLoadMoreButton('news', 1, 1);
+               }
+
+               } catch (error) {
+               console.error("Failed to fetch initial data:", error);
+               showLoadingState('tools', false);
+               showLoadingState('news', false);
+               if (toolsGrid) toolsGrid.innerHTML = `<p class="text-red-500 col-span-full text-center py-10">Failed to load tools. Error: ${error.message}. Is the backend server running at ${API_BASE_URL}?</p>`;
+               if (newsGrid) newsGrid.innerHTML = `<p class="text-red-500 col-span-full text-center py-10">Failed to load news. Error: ${error.message}</p>`;
+               updateLoadMoreButton('tools', 1, 1);
+               updateLoadMoreButton('news', 1, 1);
+               }
+           }
+
+           function createToolCardFromData(tool) {
+               // Basic check for essential data
+               if (!tool || !tool.slug || !tool.name) {
+               console.warn('Skipping tool card rendering due to missing essential data:', tool);
+               return null;
+               }
+
+               const newTool = document.createElement('div');
+               newTool.className = 'bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden tool-card';
+               // Set data attributes from API data for filtering/sorting/details
+               newTool.dataset.category = tool.category_slug || 'unknown';
+               newTool.dataset.rating = tool.rating_avg || '0';
+               // Use date string directly if needed for sorting
+               newTool.dataset.date = tool.created_at ? new Date(tool.created_at).toISOString().split('T')[0] : '';
+               // Add slug for easy identification
+               newTool.dataset.slug = tool.slug;
+
+               // Map API fields to icons/colors
+               let iconClass = 'fa-puzzle-piece text-gray-600'; let bgColorClass = 'bg-gray-100'; let tagBgColorClass = 'bg-gray-100'; let tagTextColorClass = 'text-gray-800';
+               switch (tool.category_slug) {
+               case 'text-ai': iconClass = 'fa-robot text-blue-600'; bgColorClass = 'bg-blue-100'; tagBgColorClass = 'bg-blue-100'; tagTextColorClass = 'text-blue-800'; break;
+               case 'image-ai': iconClass = 'fa-palette text-purple-600'; bgColorClass = 'bg-purple-100'; tagBgColorClass = 'bg-purple-100'; tagTextColorClass = 'text-purple-800'; break;
+               case 'code-ai': iconClass = 'fa-code text-green-600'; bgColorClass = 'bg-green-100'; tagBgColorClass = 'bg-green-100'; tagTextColorClass = 'text-green-800'; break;
+               case 'video-ai': iconClass = 'fa-video text-red-600'; bgColorClass = 'bg-red-100'; tagBgColorClass = 'bg-red-100'; tagTextColorClass = 'text-red-800'; break;
+               case 'audio-ai': iconClass = 'fa-music text-yellow-600'; bgColorClass = 'bg-yellow-100'; tagBgColorClass = 'bg-yellow-100'; tagTextColorClass = 'text-yellow-800'; break;
+               case 'utility-ai': iconClass = 'fa-cogs text-emerald-600'; bgColorClass = 'bg-emerald-100'; tagBgColorClass = 'bg-emerald-100'; tagTextColorClass = 'text-emerald-800'; break;
+               }
+
+               // Format rating to one decimal place, handle nulls
+               const ratingDisplay = tool.rating_avg !== null ? parseFloat(tool.rating_avg).toFixed(1) : 'N/A';
+
+               // Generate HTML using template literals and API data
+               newTool.innerHTML = `
+                   <div class="p-5">
+                       <div class="flex items-center justify-between mb-4">
+                           <div class="flex items-center min-w-0"> <!-- Added min-w-0 for truncation -->
+                               <div class="flex-shrink-0 h-10 w-10 ${bgColorClass} rounded-lg flex items-center justify-center mr-3"><i class="fas ${iconClass} fa-fw"></i></div>
+                               <div class="min-w-0"> <!-- Added min-w-0 for truncation -->
+                                   <h3 class="text-lg font-semibold text-gray-900 truncate" title="${tool.name}">${tool.name}</h3>
+                                   <p class="text-sm text-gray-500 truncate">${tool.vendor_name || ''}</p> <!-- Add vendor if available -->
+                               </div>
+                           </div>
+                           <div class="flex-shrink-0 ml-2"><span class="${tagBgColorClass} ${tagTextColorClass} text-xs font-medium px-2.5 py-0.5 rounded tool-category-tag">${tool.category_name || 'Uncategorized'}</span></div>
+                       </div>
+                       <p class="text-gray-600 text-sm mb-4 line-clamp-3" title="${tool.description || ''}">${tool.description || 'No description available.'}</p>
+                       <div class="flex items-center justify-between mb-4 text-sm">
+                           <div class="flex items-center text-gray-600">
+                               <div class="flex items-center" title="Rating">
+                                   <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                   <span class="font-medium tool-rating">${ratingDisplay}</span>
+                               </div>
+                               <span class="mx-2 text-gray-300">|</span>
+                               <div class="flex items-center" title="Reviews">
+                                   <i class="fas fa-comment text-gray-400 mr-1"></i>
+                                   <span>${tool.review_count || 0}</span>
+                               </div>
+                           </div>
+                           <div class="text-gray-700 font-medium tool-price" data-price-low="${tool.pricing_low !== null ? tool.pricing_low : 9999}" data-price-high="${tool.pricing_high !== null ? tool.pricing_high : 9999}" title="${tool.pricing_text || ''}">${tool.pricing_text || 'N/A'}</div>
+                       </div>
+                       <div class="flex flex-wrap gap-1 mb-4">
+                           ${(tool.tags_array || []).slice(0, 4).map(tag => `<span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">${tag}</span>`).join('')}
+                           ${(tool.tags_array && tool.tags_array.length > 4) ? `<span class="text-xs text-gray-400">+${tool.tags_array.length - 4}</span>` : ''}
+                       </div>
+                       <div class="flex justify-between items-center">
+                           <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm view-details" data-tool-slug="${tool.slug}" data-tool-name="${tool.name || ''}">View Details</a>
+                           <a href="${tool.try_now_url || tool.website_url || '#'}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now">
+                                ${tool.try_now_url && tool.try_now_url !== '#' ? 'Try Now' : 'Visit Site'}
+                            </a>
+                        </div>
+                   </div>`;
+               return newTool;
+           }
+
+           function createNewsCardFromData(article) {
+               // Basic check for essential data
+               if (!article || !article.slug || !article.title) {
+                   console.warn('Skipping news card rendering due to missing essential data:', article);
+                   return null;
+               }
+               const newsCard = document.createElement('div');
+               newsCard.className = 'bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden news-card';
+               newsCard.dataset.category = article.category || 'general';
+               newsCard.dataset.date = article.published_date ? new Date(article.published_date).toISOString().split('T')[0] : '';
+               newsCard.dataset.slug = article.slug; // Add slug for easier reference if needed
+
+               let tagBgColorClass = 'bg-gray-100'; let tagTextColorClass = 'text-gray-800'; let categoryText = 'General';
+               switch (article.category) {
+               case 'release': tagBgColorClass = 'bg-blue-100'; tagTextColorClass = 'text-blue-800'; categoryText = 'New Release'; break;
+               case 'trend': tagBgColorClass = 'bg-purple-100'; tagTextColorClass = 'text-purple-800'; categoryText = 'Industry Trend'; break;
+               case 'research': tagBgColorClass = 'bg-green-100'; tagTextColorClass = 'text-green-800'; categoryText = 'Research'; break;
+               case 'update': tagBgColorClass = 'bg-yellow-100'; tagTextColorClass = 'text-yellow-800'; categoryText = 'Update'; break;
+               }
+               const imageUrl = article.image_url || `https://via.placeholder.com/400x192/E2E8F0/4A5568?text=News`;
+               const formattedDate = article.published_date ? new Date(article.published_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'}) : 'N/A';
+               // Simple description preview (first ~150 chars)
+               const descriptionPreview = article.content ? (article.content.length > 150 ? article.content.substring(0, 150) + '...' : article.content) : 'No content preview available.';
+
+               newsCard.innerHTML = `
+                   <div class="h-48 bg-gray-200 relative">
+                       <img loading="lazy" src="${imageUrl}" alt="${article.title}" class="absolute inset-0 w-full h-full object-cover">
+                       <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-50"></div>
+                       <div class="absolute top-4 left-4"> <span class="${tagBgColorClass} ${tagTextColorClass} text-xs font-medium px-2.5 py-0.5 rounded news-category-tag">${categoryText}</span> </div>
+                   </div>
+                   <div class="p-5">
+                       <div class="flex items-center justify-between mb-2"> <span class="text-sm text-gray-500 news-date">${formattedDate}</span> <span class="text-sm text-gray-500"><!-- Read time? --></span> </div>
+                       <h3 class="text-xl font-bold text-gray-900 mb-2">${article.title}</h3>
+                       <p class="text-gray-600 text-sm mb-4 line-clamp-3" title="${article.content || ''}">${descriptionPreview}</p>
+                       <div class="flex items-center justify-between">
+                           <div class="flex items-center">
+                               <!-- Author avatar? -->
+                               <span class="text-sm text-gray-600">${article.author || 'Unknown Author'}</span>
+                           </div>
+                           <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium text-sm read-more" data-news-slug="${article.slug}" data-news-title="${article.title}">Read More</a>
+                       </div>
+                   </div>`;
+               return newsCard;
+           }
+
+           function updateLoadMoreButton(type, currentPage, totalPages) {
+               const btn = type === 'tools' ? loadMoreToolsBtn : loadMoreNewsBtn;
+               const noMoreMsgElement = type === 'tools' ? noMoreToolsMsg : noMoreNewsMsg;
+               if (!btn || !noMoreMsgElement) return;
+
+               // Ensure totalPages is at least 1
+               totalPages = Math.max(1, totalPages);
+
+               if (currentPage >= totalPages) {
+                   btn.classList.add('hidden');
+                   // Only show "no more" message if there was data initially or after loading more
+                   if(type === 'tools' && allToolCards.length > 0) noMoreMsgElement.classList.remove('hidden');
+                   if(type === 'news' && allNewsCards.length > 0) noMoreMsgElement.classList.remove('hidden');
+               } else {
+                   btn.classList.remove('hidden');
+                   noMoreMsgElement.classList.add('hidden');
+               }
+               btn.disabled = false;
+               btn.innerHTML = `Load More ${type === 'tools' ? 'Tools' : 'News'} <i class="fas fa-chevron-down ml-2"></i>`;
+           }
+
+           function showLoadingState(type, isLoading) {
+               const grid = type === 'tools' ? toolsGrid : newsGrid;
+               const loadingMsgId = `loading-${type}-message`;
+               let loadingElement = document.getElementById(loadingMsgId);
+
+               if (isLoading) {
+                   if (!loadingElement && grid) {
+                       grid.innerHTML = ''; // Clear previous content before showing loading
+                       loadingElement = document.createElement('p');
+                       loadingElement.id = loadingMsgId;
+                       loadingElement.className = 'text-gray-500 col-span-full text-center py-10 animate-pulse';
+                       loadingElement.textContent = `Loading ${type}...`;
+                       grid.appendChild(loadingElement);
+                   }
+               } else {
+                   if (loadingElement) {
+                       loadingElement.remove();
+                   }
+               }
+           }
+
+           // ==================================================
+           // == EVENT HANDLERS & UI LOGIC
+           // ==================================================
+
+           // --- Modal Handling ---
+           function setupModal() {
+               if (!modal || !modalCloseBtn) return;
+               modalCloseBtn.addEventListener('click', closeModal);
+               window.addEventListener('click', (event) => {
+                   if (event.target === modal) {
+                       closeModal();
+                   }
+               });
+               document.addEventListener('keydown', (event) => {
+                   if (event.key === "Escape" && modal.style.display === 'block') {
+                       closeModal();
+                   }
+               });
+               // Listener for dynamically added content inside modal (like Try Now buttons)
+               modal.addEventListener('click', handleModalClicks);
+               // Listener for switching between Sign In/Sign Up forms
+               modal.addEventListener('click', handleAuthFormSwitch);
+               // Listener for form submissions inside modal
+               modal.addEventListener('submit', handleModalFormSubmit); // Uses the UPDATED submit handler
+
+           }
+
+           function showModal(title, content, isAuth = false) { // Added isAuth flag
+               if (!modal || !modalTitle || !modalBody || !modalContentElement) return;
+               modalTitle.textContent = title;
+               modalBody.innerHTML = content; // Use innerHTML carefully, sanitize if needed
+
+               // Adjust modal width for auth forms
+               if (isAuth) {
+                   modalContentElement.classList.add('auth-modal');
+               } else {
+                   modalContentElement.classList.remove('auth-modal');
+               }
+
+               modal.style.display = 'block';
+               document.body.style.overflow = 'hidden'; // Prevent background scroll
+           }
+
+           function closeModal() {
+               if (!modal) return;
+               modal.style.display = 'none';
+               modalTitle.textContent = '';
+               modalBody.innerHTML = '';
+               modalContentElement?.classList.remove('auth-modal'); // Remove auth class on close
+               document.body.style.overflow = ''; // Restore background scroll
+           }
+
+
+           function handleModalClicks(e) {
+               // Handle "Try Now" buttons clicked *inside* the modal
+               if (e.target && e.target.classList.contains('try-now-modal')) {
+                   // The default link behavior with target="_blank" handles this.
+                   console.log('Try Now clicked in modal:', e.target.href);
+               }
+               // Handle clicks on view details links within matchmaker results
+               if (e.target.classList.contains('view-details-matchmaker')) {
+                   e.preventDefault();
+                   handleViewDetails(e); // Reuse the existing details handler
+               }
+               // Handle clicks on internal page links within modal (e.g., from matchmaker)
+               if (e.target.classList.contains('nav-link-modal')) {
+                   const hrefAttribute = e.target.getAttribute('href');
+                   if (hrefAttribute && hrefAttribute.startsWith('#')) {
+                       e.preventDefault();
+                       closeModal(); // Close modal first
+                       const targetElement = document.querySelector(hrefAttribute);
+                       scrollToElement(targetElement); // Use helper
+                   }
+               }
+                // Handle clicks on forgot password link (DEMO)
+               if (e.target.matches('.modal-form-link') && e.target.textContent.toLowerCase().includes('forgot password')) {
+                   e.preventDefault();
+                   showModal('Forgot Password (Demo)', '<p>Password reset functionality not implemented in this version.</p>');
+                   // setTimeout(closeModal, 2000); // Keep modal open longer for demo
+               }
+           }
+
+           // --- Tool Card Event Handling ---
+           function attachAllToolCardEvents(container) {
+               container?.querySelectorAll('.tool-card').forEach(card => {
+                   attachSingleToolCardEvents(card);
+               });
+           }
+
+           function attachSingleToolCardEvents(cardElement) {
+               const detailsLink = cardElement.querySelector('.view-details');
+               // Remove previous listeners before adding new ones (safer)
+               detailsLink?.removeEventListener('click', handleViewDetails);
+               // Add listener
+               detailsLink?.addEventListener('click', handleViewDetails);
+           }
+
+           // Handler for "View Details" click
+           function handleViewDetails(e) {
+               e.preventDefault();
+               const targetLink = e.target.closest('.view-details');
+               if (!targetLink) return;
+
+               const toolCard = targetLink.closest('.tool-card');
+               if (!toolCard) { console.error("Could not find parent tool card."); return; }
+
+               const toolName = targetLink.getAttribute('data-tool-name');
+               const toolSlug = targetLink.getAttribute('data-tool-slug');
+
+               if (!toolName || !toolSlug) { console.error("Missing tool name or slug on details link."); return;}
+
+                // Show loading state initially while fetching full details
+               showModal(`${toolName} - Details`, '<p class="text-center p-4 animate-pulse">Loading full details...</p>');
+
+               // Fetch full details from API
+               fetch(`${API_BASE_URL}/tools/${toolSlug}`)
+                 .then(response => {
+                     if (!response.ok) {
+                          if (response.status === 404) throw new Error('Tool details not found.');
+                          throw new Error(`Network response was not ok (Status: ${response.status})`);
+                     }
+                     return response.json();
+                  })
+                 .then(fullToolData => {
+                     // Construct modal content using fetched data
+                     const categoryName = fullToolData.category_name || 'N/A';
+                     const rating = fullToolData.rating_avg !== null ? parseFloat(fullToolData.rating_avg).toFixed(1) : 'N/A';
+                     const price = fullToolData.pricing_text || 'N/A';
+                     const description = fullToolData.description || 'No description available.';
+                     const tryNowUrl = fullToolData.try_now_url || fullToolData.website_url || '#';
+                     const tryNowText = (fullToolData.try_now_url && fullToolData.try_now_url !== '#') ? 'Try Now' : 'Visit Site';
+                     const tags = fullToolData.tags_array || [];
+                     const features = fullToolData.features_json || {}; // Assuming features_json is an object { featureName: description/boolean }
+
+                     let featuresHTML = '';
+                     if (Object.keys(features).length > 0) {
+                         featuresHTML = '<h4 class="font-semibold text-gray-800 mt-4 mb-2">Key Features:</h4><ul class="list-disc list-inside text-sm space-y-1">';
+                         for (const featureName in features) {
+                             // Simple display, adjust formatting as needed based on features_json structure
+                             featuresHTML += `<li><strong>${featureName}:</strong> ${features[featureName]}</li>`;
+                         }
+                         featuresHTML += '</ul>';
+                     }
+
+
+                     const detailsContent = `
+                       <p class="mb-2 text-sm text-gray-500">Category: ${categoryName}</p>
+                       <p class="mb-4">${description}</p>
+                       <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm mb-4 border-t border-b py-3">
+                           <div><strong>Rating:</strong> ${rating} ${rating !== 'N/A' ? '<i class="fas fa-star text-yellow-400 ml-1"></i>' : ''}</div>
+                           <div><strong>Pricing:</strong> ${price}</div>
+                           <div><strong>Reviews:</strong> ${fullToolData.review_count || '0'}</div>
+                           <!-- Add more fields from fullToolData if needed -->
+                       </div>
+                       ${tags.length > 0 ? `
+                       <div class="mb-4">
+                           <strong>Tags:</strong>
+                           <div class="flex flex-wrap gap-1 mt-1">
+                              ${tags.map(tag => `<span class="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded">${tag}</span>`).join('')}
+                           </div>
+                       </div>
+                       ` : ''}
+                       ${featuresHTML}
+                       <div class="mt-6">
+                            <a href="${tryNowUrl}" target="_blank" rel="noopener noreferrer" class="inline-block px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 try-now-modal">
+                            ${tryNowText} <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                            </a>
+                       </div>
+                   `;
+                     // Update the existing modal content
+                     if(modalTitle) modalTitle.textContent = `${fullToolData.name} - Details`; // Update title too
+                     if(modalBody) modalBody.innerHTML = detailsContent;
+
+                  })
+                  .catch(error => {
+                      console.error("Error fetching full tool details:", error);
+                      if(modalBody) modalBody.innerHTML = `<p class="text-red-500 text-center p-4">Could not load full details. ${error.message}</p>`;
+                  });
+           }
+
+
+            // --- News Grid Click Handling (Read More) ---
+           function setupNewsGridDelegation() {
+               newsGrid?.addEventListener('click', handleReadMoreNews); // Use the async handler
+           }
+
+           async function handleReadMoreNews(e) {
+               const readMoreLink = e.target.closest('.read-more');
+               if (readMoreLink) {
+                   e.preventDefault();
+                   const newsCard = readMoreLink.closest('.news-card');
+                   if (!newsCard) return;
+
+                   const newsSlug = readMoreLink.getAttribute('data-news-slug');
+                   const articleTitle = readMoreLink.getAttribute('data-news-title') || 'News Article';
+
+                   if (!newsSlug) {
+                       console.error('Missing data-news-slug attribute.');
+                       showModal('Error', '<p>Could not load article details (missing identifier).</p>');
+                       return;
+                   }
+
+                   console.log(`Fetching news article: ${newsSlug}`);
+                   showModal(articleTitle, '<p class="text-center p-4 animate-pulse">Loading article...</p>');
+
+                   try {
+                       const response = await fetch(`${API_BASE_URL}/news/${newsSlug}`);
+                       if (!response.ok) {
+                           if (response.status === 404) throw new Error('Article not found.');
+                           throw new Error(`HTTP error! status: ${response.status}`);
+                       }
+                       const article = await response.json();
+
+                       // Simple sanitization placeholder - replace with robust library like DOMPurify if needed
+                       const sanitizedContent = article.content ? article.content.replace(/<script.*?>.*?<\/script>/gi, '') : '<p>Full content not available.</p>';
+
+                       const modalContent = `
+                           <article class="prose prose-indigo max-w-none"> <!-- Tailwind Typography plugin styling -->
+                               ${sanitizedContent}
+                           </article>
+                           <p class="text-sm text-gray-500 mt-4 pt-4 border-t">
+                               Published: ${article.published_date ? new Date(article.published_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric'}) : 'N/A'}
+                               ${article.author ? ` by ${article.author}` : ''}
+                           </p>`;
+
+                       modalTitle.textContent = article.title || articleTitle;
+                       modalBody.innerHTML = modalContent;
+
+                   } catch (error) {
+                       console.error("Failed to fetch news article:", error);
+                       showModal(articleTitle, `<p class="text-red-500 text-center p-4">Failed to load article content. ${error.message}</p>`);
+                   }
+               }
+           }
+
+           // --- Load More Buttons ---
+           function setupLoadMoreButtons() {
+               loadMoreToolsBtn?.addEventListener('click', handleLoadMoreTools);
+               loadMoreNewsBtn?.addEventListener('click', handleLoadMoreNews);
+           }
+
+           async function handleLoadMoreTools() {
+               if (toolsCurrentPage >= totalToolPages) return;
+               toolsCurrentPage++;
+               console.log(`Loading tools page ${toolsCurrentPage}...`);
+               loadMoreToolsBtn.disabled = true;
+               loadMoreToolsBtn.innerHTML = 'Loading... <i class="fas fa-spinner fa-spin ml-2"></i>';
+
+               try {
+                   const response = await fetch(`${API_BASE_URL}/tools?page=${toolsCurrentPage}&limit=6`); // Fetch subsequent pages
+                   if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                   const data = await response.json();
+
+                   if (data.tools && data.tools.length > 0) {
+                       const fragment = document.createDocumentFragment();
+                       data.tools.forEach(tool => {
+                           const toolCard = createToolCardFromData(tool);
+                           if (toolCard) {
+                               fragment.appendChild(toolCard);
+                               attachSingleToolCardEvents(toolCard); // Attach events to ONLY new cards
+                           }
+                       });
+                       toolsGrid?.appendChild(fragment);
+                       // Update master list AFTER adding to DOM
+                       allToolCards = Array.from(toolsGrid?.querySelectorAll('.tool-card') || []);
+                   } else {
+                       totalToolPages = toolsCurrentPage; // Adjust if API returns empty early
+                   }
+                   totalToolPages = data.pagination?.totalPages || totalToolPages; // Update total pages from API response
+                   updateLoadMoreButton('tools', toolsCurrentPage, totalToolPages);
+                   filterAndSortTools(); // Re-apply filters AFTER new items are added
+
+               } catch (error) {
+                   console.error("Failed to load more tools:", error);
+                   loadMoreToolsBtn.innerHTML = 'Load More Tools <i class="fas fa-exclamation-circle ml-2"></i>';
+                   loadMoreToolsBtn.disabled = false;
+                   toolsCurrentPage--; // Revert page number on error
+               }
+           }
+
+           async function handleLoadMoreNews() {
+               if (newsCurrentPage >= totalNewsPages) return;
+               newsCurrentPage++;
+               console.log(`Loading news page ${newsCurrentPage}...`);
+               loadMoreNewsBtn.disabled = true;
+               loadMoreNewsBtn.innerHTML = 'Loading... <i class="fas fa-spinner fa-spin ml-2"></i>';
+
+               try {
+                   const response = await fetch(`${API_BASE_URL}/news?page=${newsCurrentPage}&limit=3`);
+                   if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                   const data = await response.json();
+
+                   if (data.news && data.news.length > 0) {
+                       const fragment = document.createDocumentFragment();
+                       data.news.forEach(article => {
+                           const newsCard = createNewsCardFromData(article);
+                           if (newsCard) fragment.appendChild(newsCard);
+                       });
+                       newsGrid?.appendChild(fragment);
+                       allNewsCards = Array.from(newsGrid?.querySelectorAll('.news-card') || []);
+                   } else {
+                       totalNewsPages = newsCurrentPage; // Adjust if needed
+                   }
+                   totalNewsPages = data.pagination?.totalPages || totalNewsPages;
+                   updateLoadMoreButton('news', newsCurrentPage, totalNewsPages);
+                   filterAndSortNews(); // Re-apply filters AFTER new items are added
+
+               } catch (error) {
+                   console.error("Failed to load more news:", error);
+                   loadMoreNewsBtn.innerHTML = 'Load More News <i class="fas fa-exclamation-circle ml-2"></i>';
+                   loadMoreNewsBtn.disabled = false;
+                   newsCurrentPage--; // Revert page number
+               }
+           }
+
+           // --- Filtering and Sorting (Client-Side for Phase 1) ---
+           function setupFilterSortListeners() {
+               // Tool Filters
+               toolFilterButtonsContainer?.addEventListener('click', (e) => {
+               if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('filter-button-active')) {
+                   toolFilterButtonsContainer.querySelectorAll('button').forEach(btn => {
+                   btn.classList.remove('filter-button-active'); // Removed specific style classes here, rely on CSS definition
+                   btn.classList.add('filter-button-inactive');
+                   });
+                   e.target.classList.remove('filter-button-inactive');
+                   e.target.classList.add('filter-button-active');
+                   filterAndSortTools();
+               }
+               });
+               toolSearchInput?.addEventListener('input', filterAndSortTools);
+               toolSortSelect?.addEventListener('change', filterAndSortTools);
+
+               // News Filters
+               newsFilterButtonsContainer?.addEventListener('click', (e) => {
+               if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('filter-button-active')) {
+                   newsFilterButtonsContainer.querySelectorAll('button').forEach(btn => {
+                   btn.classList.remove('filter-button-active');
+                   btn.classList.add('filter-button-inactive');
+                   });
+                   e.target.classList.remove('filter-button-inactive');
+                   e.target.classList.add('filter-button-active');
+                   filterAndSortNews();
+               }
+               });
+               newsSortSelect?.addEventListener('change', filterAndSortNews);
+           }
+
+           function filterAndSortTools() {
+               if (!toolsGrid) return;
+
+               const selectedCategoryFilter = toolFilterButtonsContainer?.querySelector('.filter-button-active')?.dataset.filter || 'all';
+               const searchTerm = toolSearchInput?.value.toLowerCase().trim() || '';
+               const sortValue = toolSortSelect?.value || 'popularity';
+
+               let visibleCount = 0;
+               const noResultsMessageId = 'no-results-message-tools';
+               let noResultsElement = document.getElementById(noResultsMessageId);
+               if(noResultsElement) noResultsElement.remove();
+
+               const currentToolCards = allToolCards; // Use the master list
+
+               // Create a list of cards matching the criteria
+               let filteredCards = currentToolCards.filter(card => {
+                   const cardCategory = card.dataset.category?.toLowerCase() || '';
+                   const categoryMatch = selectedCategoryFilter === 'all' || cardCategory === selectedCategoryFilter;
+
+                   const toolName = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                   const toolDesc = card.querySelector('p.text-gray-600')?.textContent.toLowerCase() || '';
+                    const toolTags = Array.from(card.querySelectorAll('.flex-wrap.gap-1 span')).map(span => span.textContent.toLowerCase());
+                   const searchMatch = searchTerm === '' || toolName.includes(searchTerm) || toolDesc.includes(searchTerm) || toolTags.some(tag => tag.includes(searchTerm));
+
+
+                   return categoryMatch && searchMatch;
+               });
+
+               // Sort the filtered cards
+               filteredCards.sort((a, b) => {
+                   switch (sortValue) {
+                       case 'rating':
+                           const ratingA = parseFloat(a.dataset.rating || 0);
+                           const ratingB = parseFloat(b.dataset.rating || 0);
+                           return ratingB - ratingA;
+                       case 'newest':
+                           const dateA = new Date(a.dataset.date || 0).getTime(); // Use getTime for comparison
+                           const dateB = new Date(b.dataset.date || 0).getTime();
+                           if (isNaN(dateA) && isNaN(dateB)) return 0;
+                           if (isNaN(dateA)) return 1;
+                           if (isNaN(dateB)) return -1;
+                           return dateB - dateA;
+                       case 'price_asc':
+                           const priceA = parseFloat(a.querySelector('.tool-price')?.dataset.priceLow ?? 9999);
+                           const priceB = parseFloat(b.querySelector('.tool-price')?.dataset.priceLow ?? 9999);
+                           return priceA - priceB;
+                       case 'popularity':
+                       default:
+                            // Cannot truly sort by popularity client-side without data
+                            // Maintain original relative order or sort by ID/slug if needed
+                            return 0;
+                   }
+               });
+
+                // Update DOM visibility and order
+               let lastVisibleCard = null; // Keep track of the last placed card for ordering
+               toolsGrid.innerHTML = ''; // Clear grid before re-appending (simpler than detaching/reordering)
+               const fragment = document.createDocumentFragment();
+
+               currentToolCards.forEach(card => {
+                   if (filteredCards.includes(card)) {
+                       // Card should be visible
+                       card.classList.remove('hidden');
+                       // We will append it later in sorted order
+                   } else {
+                       // Card should be hidden
+                       card.classList.add('hidden');
+                       fragment.appendChild(card); // Keep hidden cards in fragment for now
+                   }
+               });
+
+                // Append sorted visible cards
+               filteredCards.forEach(card => {
+                   fragment.appendChild(card);
+                   visibleCount++;
+               });
+
+                // Append hidden cards back (so they remain in the DOM if needed later)
+                // This step might be unnecessary if hidden class works reliably
+
+                toolsGrid.appendChild(fragment); // Add all cards back (visible sorted first)
+
+
+               // Show "No results" message if necessary
+               if (visibleCount === 0 && (searchTerm !== '' || selectedCategoryFilter !== 'all')) {
+                    const p = document.createElement('p');
+                    p.id = noResultsMessageId;
+                    p.className = 'text-gray-500 col-span-full text-center py-10';
+                    p.textContent = 'No tools match your current filters.';
+                    toolsGrid.appendChild(p);
+               }
+           }
+
+           function filterAndSortNews() {
+               if (!newsGrid) return;
+
+               const selectedCategoryFilter = newsFilterButtonsContainer?.querySelector('.filter-button-active')?.dataset.filter || 'all';
+               const sortValue = newsSortSelect?.value || 'latest';
+
+               let visibleCount = 0;
+               const noResultsMessageId = 'no-results-message-news';
+               let noResultsElement = document.getElementById(noResultsMessageId);
+               if(noResultsElement) noResultsElement.remove();
+
+               const currentNewsCards = allNewsCards; // Use master list
+
+               let filteredCards = currentNewsCards.filter(card => {
+                   const cardCategory = card.dataset.category?.toLowerCase() || '';
+                   return selectedCategoryFilter === 'all' || cardCategory === selectedCategoryFilter;
+               });
+
+               filteredCards.sort((a, b) => {
+                   switch (sortValue) {
+                       case 'most_read': // Placeholder
+                           const titleA = a.querySelector('h3')?.textContent.length || 0;
+                           const titleB = b.querySelector('h3')?.textContent.length || 0;
+                           return titleB - titleA;
+                       case 'featured': // Placeholder
+                           return 0; // Needs actual featured data
+                       case 'latest':
+                       default:
+                           const dateA = new Date(a.dataset.date || 0).getTime();
+                           const dateB = new Date(b.dataset.date || 0).getTime();
+                           if (isNaN(dateA) && isNaN(dateB)) return 0;
+                           if (isNaN(dateA)) return 1;
+                           if (isNaN(dateB)) return -1;
+                           return dateB - dateA;
+                   }
+               });
+
+               // Update DOM visibility and order
+               newsGrid.innerHTML = ''; // Clear grid
+               const fragment = document.createDocumentFragment();
+
+               currentNewsCards.forEach(card => {
+                   if (filteredCards.includes(card)) {
+                       card.classList.remove('hidden');
+                       // Append later in sorted order
+                   } else {
+                       card.classList.add('hidden');
+                       fragment.appendChild(card); // Keep hidden
+                   }
+               });
+
+               filteredCards.forEach(card => {
+                    fragment.appendChild(card);
+                    visibleCount++;
+               });
+
+               newsGrid.appendChild(fragment);
+
+
+               // Show "No results" message if necessary
+               if (visibleCount === 0 && selectedCategoryFilter !== 'all') {
+                    const p = document.createElement('p');
+                    p.id = noResultsMessageId;
+                    p.className = 'text-gray-500 col-span-full text-center py-10';
+                    p.textContent = 'No news articles match your current filters.';
+                    newsGrid.appendChild(p);
+               }
+           }
+
+
+           // --- Comparison Tool ---
+           function setupComparisonTool() {
+               compareBtn?.addEventListener('click', handleCompareClick);
+           }
+
+           function populateCompareSelects(tools = []) {
+               if (!compareSelects || compareSelects.length === 0) return;
+
+               const uniqueTools = [];
+               const seenSlugs = new Set();
+                // Use allToolCards which should be populated by fetchAndRenderInitialData
+                // If allToolCards isn't reliable or you want ONLY the first page, use the passed 'tools'
+                const sourceTools = allToolCards.length > 0 ?
+                    allToolCards.map(card => ({ name: card.querySelector('h3')?.textContent, slug: card.dataset.slug }))
+                    : tools;
+
+
+               sourceTools.forEach(tool => {
+                   if (tool.slug && tool.name && !seenSlugs.has(tool.slug)) {
+                       uniqueTools.push({ name: tool.name, slug: tool.slug });
+                       seenSlugs.add(tool.slug);
+                   }
+               });
+               uniqueTools.sort((a, b) => a.name.localeCompare(b.name));
+
+               compareSelects.forEach((select, index) => {
+                   const currentValue = select.value;
+                   select.innerHTML = `<option value="">Select AI Tool ${index + 1}${index > 1 ? ' (Optional)' : ''}</option>`;
+                   uniqueTools.forEach(tool => {
+                       const option = document.createElement('option');
+                       option.value = tool.slug;
+                       option.textContent = tool.name;
+                       select.appendChild(option);
+                   });
+                   // Attempt to restore previous selection if it's still valid
+                   if (currentValue && seenSlugs.has(currentValue)) {
+                        select.value = currentValue;
+                    } else if (index > 0 && select.options.length > 1 && select.options[1].value === compareSelects[index-1]?.value) {
+                        // Prevent selecting the same tool as the previous dropdown initially
+                        select.value = "";
+                   }
+               });
+               console.log(`Populated comparison selects with ${uniqueTools.length} tools.`);
+           }
+
+
+           function handleCompareClick() {
+               const selectedSlugs = Array.from(compareSelects)
+                                           .map(select => select.value)
+                                           .filter(value => value && value !== "");
+               const uniqueSelectedSlugs = [...new Set(selectedSlugs)];
+
+               if (uniqueSelectedSlugs.length < 2) {
+                   showModal('Selection Error', '<p>Please select at least 2 different tools to compare.</p>');
+                   comparisonResultsDiv?.classList.add('hidden');
+                   comparisonPlaceholder?.classList.remove('hidden');
+                   if (currentPerformanceChart) currentPerformanceChart.destroy();
+                   return;
+               }
+               if (uniqueSelectedSlugs.length > 4) {
+                   showModal('Selection Limit', '<p>You can compare a maximum of 4 tools at a time.</p>');
+                   return;
+               }
+
+               console.log('Comparing tools with slugs:', uniqueSelectedSlugs);
+
+               comparisonPlaceholder?.classList.add('hidden');
+               comparisonResultsDiv?.classList.remove('hidden');
+               if (comparisonTable) comparisonTable.querySelector('tbody').innerHTML = '<tr><td colspan="5" class="text-center p-4 animate-pulse">Loading comparison data...</td></tr>';
+               if (currentPerformanceChart) currentPerformanceChart.destroy();
+
+               Promise.all(uniqueSelectedSlugs.map(slug =>
+                   fetch(`${API_BASE_URL}/tools/${slug}`)
+                       .then(response => {
+                           if (!response.ok) { console.error(`Failed to fetch details for ${slug}, status: ${response.status}`); return { slug: slug, error: true, name: slug }; }
+                           return response.json();
+                       })
+                       .catch(error => { console.error(`Fetch error for ${slug}:`, error); return { slug: slug, error: true, name: slug }; })
+               ))
+               .then(toolDetailsArray => {
+                   const successfulDetails = toolDetailsArray.filter(details => !details.error);
+                   const failedSlugs = toolDetailsArray.filter(details => details.error).map(d => d.slug);
+
+                   if (failedSlugs.length > 0) {
+                       // Append warning to modal shown after successful ones load
+                       setTimeout(() => showModal('Comparison Data Missing', `<p>Could not load full details for the following tools: ${failedSlugs.join(', ')}. Showing available data.</p>`), 500);
+                   }
+
+                   if (successfulDetails.length < 2) {
+                       showModal('Comparison Error', '<p>Could not load sufficient data to perform comparison.</p>');
+                       comparisonResultsDiv?.classList.add('hidden');
+                       comparisonPlaceholder?.classList.remove('hidden');
+                       return;
+                   }
+
+                   const comparisonDataMap = successfulDetails.reduce((map, tool) => { map[tool.slug] = tool; return map; }, {});
+                   const finalSlugsToCompare = successfulDetails.map(tool => tool.slug);
+
+                   updateComparisonTable(finalSlugsToCompare, comparisonDataMap);
+                   updatePerformanceChart(finalSlugsToCompare, comparisonDataMap);
+               })
+               .catch(error => {
+                   console.error("Error fetching comparison data:", error);
+                   showModal('Comparison Error', '<p>An error occurred while fetching data for comparison.</p>');
+                   comparisonResultsDiv?.classList.add('hidden');
+                   comparisonPlaceholder?.classList.remove('hidden');
+               });
+           }
+
+           function updateComparisonTable(slugs, dataMap) {
+               if (!comparisonTable) return;
+               const thead = comparisonTable.querySelector('thead tr');
+               const tbody = comparisonTable.querySelector('tbody');
+
+               thead.innerHTML = '<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-50 z-10">Features</th>';
+               tbody.innerHTML = '';
+
+               slugs.forEach(slug => {
+                   const th = document.createElement('th');
+                   th.scope = 'col';
+                   th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]';
+                   th.textContent = dataMap[slug]?.name || slug;
+                   thead.appendChild(th);
+               });
+
+                // Define features to compare - use keys from your API response
+               const features = [
+                   { key: 'category_name', name: 'Category' },
+                   { key: 'rating_avg', name: 'Rating' },
+                   { key: 'review_count', name: 'Reviews' },
+                   { key: 'pricing_text', name: 'Pricing Model' },
+                   { key: 'pricing_low', name: 'Price Low ($)' },
+                   { key: 'description', name: 'Description' },
+                   { key: 'tags_array', name: 'Tags' },
+                   // Add more feature keys as needed from your `tools` table/API response
+                    // { key: 'feature_X', name: 'Feature X Display Name' },
+               ];
+
+
+               features.forEach(feature => {
+                   const row = tbody.insertRow();
+                   const featureCell = row.insertCell();
+                   featureCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white z-10 align-top';
+                   featureCell.textContent = feature.name;
+
+                   slugs.forEach(slug => {
+                       const dataCell = row.insertCell();
+                       dataCell.className = 'px-6 py-4 whitespace-normal text-sm text-gray-500 align-top';
+                       const toolData = dataMap[slug];
+                       let value = toolData ? toolData[feature.key] : null; // Use null for missing data
+
+                        // Handle different data types for display
+                        if (value === null || value === undefined) {
+                           dataCell.innerHTML = '<span class="text-gray-400">N/A</span>';
+                        } else if (feature.key === 'rating_avg') {
+                           dataCell.innerHTML = `${parseFloat(value).toFixed(1)} <i class="fas fa-star text-yellow-400 ml-1"></i>`;
+                        } else if (feature.key === 'tags_array' && Array.isArray(value)) {
+                           dataCell.innerHTML = value.length > 0
+                               ? value.map(tag => `<span class="inline-block bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded mr-1 mb-1">${tag}</span>`).join('')
+                               : '<span class="text-gray-400">None</span>';
+                       } else if (feature.key === 'description') {
+                            dataCell.textContent = value.length > 100 ? value.substring(0, 97) + '...' : value;
+                            dataCell.title = value; // Show full description on hover
+                        } else if (typeof value === 'boolean') {
+                            dataCell.innerHTML = value ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>';
+                        } else if (typeof value === 'number' && (feature.key === 'pricing_low' || feature.key === 'pricing_high')) {
+                            dataCell.textContent = value === 9999 ? 'N/A' : value.toFixed(2); // Format price example
+                        } else {
+                            dataCell.textContent = value; // Default text display
+                        }
+                   });
+               });
+           }
+
+           function updatePerformanceChart(slugs, dataMap) {
+               if (!performanceChartCanvas || typeof Chart === 'undefined') return; // Check Chart exists
+               const ctx = performanceChartCanvas.getContext('2d');
+
+               if (currentPerformanceChart) {
+                   currentPerformanceChart.destroy();
+                   currentPerformanceChart = null;
+               }
+
+               const datasets = [{
+                   label: 'Rating Score (out of 5)',
+                   data: slugs.map(slug => {
+                       const rating = dataMap[slug]?.rating_avg;
+                       return (rating !== null && rating !== undefined) ? parseFloat(rating) : 0; // Return number
+                   }),
+                   backgroundColor: [ /* Colors */
+                       'rgba(59, 130, 246, 0.6)', 'rgba(139, 92, 246, 0.6)',
+                       'rgba(16, 185, 129, 0.6)', 'rgba(234, 179, 8, 0.6)'
+                   ].slice(0, slugs.length),
+                   borderColor: [ /* Border Colors */
+                        'rgba(59, 130, 246, 1)', 'rgba(139, 92, 246, 1)',
+                        'rgba(16, 185, 129, 1)', 'rgba(234, 179, 8, 1)'
+                   ].slice(0, slugs.length),
+                   borderWidth: 1
+               }];
+
+               currentPerformanceChart = new Chart(ctx, {
+                   type: 'bar',
+                   data: {
+                       labels: slugs.map(slug => {
+                           const name = dataMap[slug]?.name || slug;
+                           return name.length > 15 ? name.substring(0, 12) + '...' : name;
+                       }),
+                       datasets: datasets
+                   },
+                   options: { /* Options from previous answer */
+                       indexAxis: slugs.length > 4 ? 'y' : 'x',
+                       responsive: true,
+                       maintainAspectRatio: false,
+                       scales: {
+                           y: { beginAtZero: true, max: 5, title: { display: true, text: 'Average Rating (0-5)' } },
+                           x: { ticks: { maxRotation: 0, minRotation: 0 } }
+                       },
+                       plugins: {
+                           legend: { display: false },
+                           tooltip: {
+                               callbacks: {
+                                   title: (tooltipItems) => dataMap[slugs[tooltipItems[0].dataIndex]]?.name || slugs[tooltipItems[0].dataIndex],
+                                   label: (context) => `${context.dataset.label || ''}: ${context.parsed.y?.toFixed(1) ?? context.parsed.x?.toFixed(1) ?? 'N/A'}`
+                               }
+                           }
+                       }
+                   }
+               });
+           }
+
+
+           // --- AI Matchmaker ---
+           function setupMatchmakerForm() {
+               matchmakerForm?.addEventListener('submit', handleMatchmakerSubmit);
+           }
+
+           function handleMatchmakerSubmit(e) {
+               e.preventDefault();
+               const useCaseSelect = document.getElementById('useCaseSelect');
+               const budgetSelect = document.getElementById('budgetSelect');
+               const skillLevelSelect = document.getElementById('skillLevelSelect');
+               const useCase = useCaseSelect?.value; const budget = budgetSelect?.value; const skill = skillLevelSelect?.value;
+
+               let isValid = true;
+               [useCaseSelect, budgetSelect, skillLevelSelect].forEach(sel => {
+                   if (sel && !sel.value) {
+                       sel.classList.add('border-red-500', 'ring-1', 'ring-red-500'); isValid = false;
+                   } else { sel?.classList.remove('border-red-500', 'ring-1', 'ring-red-500'); }
+               });
+
+               if (!isValid) { showModal('Missing Information', '<p>Please select an option for all three questions.</p>'); return; }
+
+                // Use allToolCards which should contain all loaded tool card elements
+                let matchedCards = allToolCards.filter(card => {
+                   const cardCategorySlug = card.dataset.category;
+                   const cardPriceLow = parseFloat(card.querySelector('.tool-price')?.dataset.priceLow ?? 9999); // Get low price from data attribute
+
+                   let budgetMatch = false;
+                    if (!budget) { // If budget is not selected, match all
+                        budgetMatch = true;
+                    } else if (budget === 'Free' && cardPriceLow === 0) {
+                        budgetMatch = true;
+                   } else if (budget === 'Low' && cardPriceLow >= 0 && cardPriceLow <= 20) { // Free tools included in Low
+                        budgetMatch = true;
+                   } else if (budget === 'Mid' && cardPriceLow > 0 && cardPriceLow <= 50) { // Exclude Free unless specifically selected
+                        budgetMatch = true;
+                   } else if (budget === 'High' && cardPriceLow > 50) {
+                        budgetMatch = true;
+                   }
+
+                   let useCaseMatch = false;
+                   if (!useCase) { // If use case not selected, match all
+                       useCaseMatch = true;
+                   } else if (useCase === 'Text Generation' && cardCategorySlug === 'text-ai') useCaseMatch = true;
+                   else if (useCase === 'Image Creation' && cardCategorySlug === 'image-ai') useCaseMatch = true;
+                   else if (useCase === 'Coding Assistance' && cardCategorySlug === 'code-ai') useCaseMatch = true;
+                   else if (useCase === 'Video Generation' && cardCategorySlug === 'video-ai') useCaseMatch = true;
+                   else if (useCase === 'Audio Creation' && cardCategorySlug === 'audio-ai') useCaseMatch = true;
+                    // Example: Be more specific for Writing Improvement if needed
+                   else if (useCase === 'Writing Improvement') {
+                        // Match utility category AND check for relevant tags or names if possible
+                        const nameMatch = card.querySelector('h3')?.textContent.toLowerCase().includes('grammar') || card.querySelector('h3')?.textContent.toLowerCase().includes('write');
+                        const tagMatch = Array.from(card.querySelectorAll('.flex-wrap.gap-1 span')).some(span => span.textContent.toLowerCase().includes('writing') || span.textContent.toLowerCase().includes('grammar'));
+                        if (cardCategorySlug === 'utility-ai' && (nameMatch || tagMatch)) {
+                            useCaseMatch = true;
+                        }
+                   }
+
+
+                   let skillMatch = true; // Simplified for now, could filter based on tags or a dedicated field later
+                   // Example idea for future:
+                   // if (skill === 'Beginner' && card.dataset.complexity === 'high') skillMatch = false;
+                   // if (skill === 'Advanced' && card.dataset.complexity === 'low') skillMatch = false; // Less relevant
+
+                   return useCaseMatch && budgetMatch && skillMatch;
+               });
+
+               matchedCards.sort((a, b) => parseFloat(b.dataset.rating || 0) - parseFloat(a.dataset.rating || 0));
+
+               let recommendation = "<div class='space-y-3'>";
+               recommendation += "<p class='text-lg font-semibold mb-2'>Based on your choices, consider these top matches:</p>";
+               if (matchedCards.length > 0) {
+                   recommendation += "<ul class='list-disc list-inside space-y-2'>";
+                   matchedCards.slice(0, 3).forEach(card => {
+                       const toolName = card.querySelector('h3')?.textContent || 'Unknown Tool';
+                       const toolSlug = card.dataset.slug;
+                       const rating = parseFloat(card.dataset.rating || 0).toFixed(1);
+                       let detailsLink = `<strong class='text-indigo-700'>${toolName}</strong> (Rating: ${rating})`;
+                       if (toolSlug && toolName) {
+                           detailsLink = `<a href="#" class='text-indigo-600 hover:underline font-semibold view-details-matchmaker' data-tool-slug="${toolSlug}" data-tool-name="${toolName}">${toolName}</a> (Rating: ${rating})`;
+                       }
+                       recommendation += `<li>${detailsLink}</li>`;
+                   });
+                   recommendation += "</ul>";
+                   if(matchedCards.length > 3) {
+                       recommendation += `<p class="text-sm text-gray-600 mt-2">(${matchedCards.length - 3} more matches found in currently loaded tools)</p>`;
+                   }
+                    recommendation += `<p class="text-sm text-gray-600 mt-2">You can also <a href='#tools' class='text-indigo-600 hover:underline nav-link-modal'>browse the full directory</a> to see all tools.</p>`;
+               } else {
+                   recommendation += `<p>No exact matches found in the currently loaded tools. Try adjusting criteria or <a href='#tools' class='text-indigo-600 hover:underline nav-link-modal'>browse the full directory</a>.</p>`;
+                   recommendation += `<p class="text-xs text-gray-400 mt-1">(Loading more tools from the directory might reveal more matches)</p>`;
+               }
+               recommendation += "<p class='text-sm text-gray-500 mt-4'>Use the <a href='#comparison' class='text-indigo-600 hover:underline nav-link-modal'>Comparison Tool</a> for detailed side-by-side analysis.</p>";
+               recommendation += "</div>";
+
+               showModal('Your AI Matchmaker Results', recommendation);
+           }
+
+
+           // --- Authentication Modal Handling ---
+           function setupAuthModals() {
+               // Listeners are now added dynamically by updateAuthUI
+               // This function remains primarily to define showAuthModal if needed elsewhere,
+               // or could be removed if showAuthModal is only called by updateAuthUI.
+           }
+
+           function showAuthModal() {
+               // Use the existing signInContentHTML defined globally in the script
+               showModal('Sign In', signInContentHTML, true); // Pass true for isAuth
+           }
+
+           function handleAuthFormSwitch(e) {
+               if (e.target.matches('.switch-to-signup')) {
+                   e.preventDefault();
+                   if(modalTitle) modalTitle.textContent = 'Sign Up';
+                   // Use the existing signUpContentHTML defined globally
+                   if(modalBody) modalBody.innerHTML = signUpContentHTML;
+                   modalContentElement?.classList.add('auth-modal'); // Ensure class is present
+               } else if (e.target.matches('.switch-to-signin')) {
+                   e.preventDefault();
+                   if(modalTitle) modalTitle.textContent = 'Sign In';
+                    // Use the existing signInContentHTML defined globally
+                   if(modalBody) modalBody.innerHTML = signInContentHTML;
+                    modalContentElement?.classList.add('auth-modal'); // Ensure class is present
+               }
+           }
+
+           // --- UPDATED Form Submit Handler ---
+           async function handleModalFormSubmit(e) { // Make the function async
+               // Only handle signup and signin forms
+               if (e.target.tagName !== 'FORM' || (e.target.id !== 'signInForm' && e.target.id !== 'signUpForm')) {
+                   return; // Do nothing for other forms inside the modal
+               }
+
+               e.preventDefault(); // Prevent default browser form submission
+
+               const form = e.target;
+               const formId = form.id;
+               const formData = new FormData(form);
+               const data = Object.fromEntries(formData.entries()); // Convert FormData to simple object
+
+               let url = '';
+               let successMessage = '';
+               let errorMessageBase = '';
+
+               // --- Input Validation (Client-Side) ---
+               if (formId === 'signUpForm') {
+                   url = `${API_BASE_URL}/auth/register`; // Use API_BASE_URL
+                   successMessage = 'Account created successfully! You can now sign in.';
+                   errorMessageBase = 'Sign up failed';
+
+                   if (!data.name || !data.email || !data.password || !data.confirmPassword) {
+                       showModal('Sign Up Error', '<p class="text-red-500">Please fill in all fields.</p>', true);
+                       return; // Stop processing
+                   }
+                   if (data.password !== data.confirmPassword) {
+                        showModal('Sign Up Error', '<p class="text-red-500">Passwords do not match. Please try again.</p>', true);
+                       return; // Stop processing
+                   }
+                    if (data.password.length < 6) {
+                        showModal('Sign Up Error', '<p class="text-red-500">Password must be at least 6 characters long.</p>', true);
+                       return;
+                    }
+                   // Remove confirmPassword before sending to backend
+                   delete data.confirmPassword;
+
+               } else if (formId === 'signInForm') {
+                   url = `${API_BASE_URL}/auth/login`; // Use API_BASE_URL
+                   successMessage = 'Sign in successful!';
+                   errorMessageBase = 'Sign in failed';
+
+                    if (!data.email || !data.password) {
+                       showModal('Sign In Error', '<p class="text-red-500">Please enter both email and password.</p>', true);
+                       return; // Stop processing
+                   }
+               } else {
+                   console.warn('Unhandled form submission in modal:', formId);
+                   return; // Exit if it's not one of the auth forms
+               }
+
+               // --- Show Loading State (Optional but recommended) ---
+                const submitButton = form.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton ? submitButton.innerHTML : '';
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                }
+
+               // --- Make the API Call using fetch ---
+               try {
+                   console.log(`Sending ${formId} data to ${url}:`, data); // Log data being sent (remove password in production logs)
+
+                   const response = await fetch(url, {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'application/json', // Essential header
+                       },
+                       body: JSON.stringify(data), // Convert JS object to JSON string
+                   });
+
+                   const result = await response.json(); // Try to parse the JSON response body
+
+                   console.log('Backend response status:', response.status);
+                   console.log('Backend response body:', result);
+
+                   if (response.ok) { // Status codes 200-299 are considered OK
+                       // --- SUCCESS ---
+                        // Show modal message first
+                        showModal(formId === 'signInForm' ? 'Sign In Success' : 'Sign Up Success', `<p class="text-green-600">${result.message || successMessage}</p>`, true);
+
+                        if (formId === 'signInForm' && result.token) {
+                           // Store the token and user info
+                           localStorage.setItem('authToken', result.token);
+                           // Ensure 'result.user.name' exists from your backend response
+                           localStorage.setItem('userName', result.user?.name || 'User');
+                           console.log('Auth token and user name stored.');
+
+                           // --- NEW: Update the main site UI immediately ---
+                           updateAuthUI();
+                        }
+                        // Close modal slightly later to allow user to read success message
+                       setTimeout(closeModal, 1800);
+
+                   } else {
+                       // --- ERROR from Backend ---
+                       // Use the error message from the backend response if available
+                       const errorText = result.error || `Server responded with status ${response.status}. Please try again.`;
+                       showModal(`${errorMessageBase} (Error ${response.status})`, `<p class="text-red-500">${errorText}</p>`, true);
+                   }
+
+               } catch (error) {
+                   // --- Network Error or other fetch issues ---
+                   console.error(`Error during ${formId} fetch:`, error);
+                    showModal(`${errorMessageBase} (Network Error)`, `<p class="text-red-500">Could not connect to the server. Please check your connection and try again. Details: ${error.message}</p>`, true);
+
+               } finally {
+                    // --- Restore Button State ---
+                   if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonText;
+                    }
+               }
+           }
+
+
+           // --- Mobile Menu ---
+           function setupMobileMenu() {
+               mobileMenuBtn?.addEventListener('click', toggleMobileMenu);
+           }
+           function toggleMobileMenu() {
+               mobileMenu?.classList.toggle('hidden');
+               const icon = mobileMenuBtn?.querySelector('i');
+               if (icon) { icon.classList.toggle('fa-bars'); icon.classList.toggle('fa-times'); }
+           }
+           function closeMobileMenu() {
+               mobileMenu?.classList.add('hidden');
+               const icon = mobileMenuBtn?.querySelector('i');
+               if (icon && icon.classList.contains('fa-times')) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+           }
+
+           // --- Smooth Scrolling ---
+           function setupSmoothScrolling() {
+               document.querySelectorAll('.nav-link').forEach(anchor => {
+                   anchor.addEventListener('click', handleSmoothScroll);
+               });
+           }
+
+           function handleSmoothScroll(e) {
+               const hrefAttribute = e.currentTarget.getAttribute('href');
+               if (hrefAttribute && hrefAttribute.startsWith('#')) {
+                   e.preventDefault();
+                   const targetElement = document.querySelector(hrefAttribute);
+                   if (targetElement) {
+                       closeMobileMenu();
+                       scrollToElement(targetElement);
+                       updateActiveNavLink(e.currentTarget, hrefAttribute);
+                   }
+               }
+           }
+
+           function scrollToElement(element) {
+               if (!element) return;
+               const navHeight = document.querySelector('nav')?.offsetHeight || 0;
+               const elementPosition = element.getBoundingClientRect().top;
+               const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+               window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+           }
+
+           function updateActiveNavLink(clickedLink, targetHref) {
+                // Desktop Links
+               document.querySelectorAll('nav .hidden.sm\\:flex .nav-link').forEach(link => {
+                   link.classList.remove('border-indigo-500', 'text-gray-900');
+                   link.classList.add('border-transparent', 'text-gray-500', 'hover:border-gray-300', 'hover:text-gray-700');
+               });
+               // Check if the clicked link is part of the main desktop navigation
+               const isDesktopNavLink = clickedLink.closest('.hidden.sm\\:flex');
+               if (isDesktopNavLink) {
+                   clickedLink.classList.add('border-indigo-500', 'text-gray-900');
+                   clickedLink.classList.remove('border-transparent', 'text-gray-500', 'hover:border-gray-300', 'hover:text-gray-700');
+               }
+
+               // Mobile Links
+               document.querySelectorAll('#mobile-menu .nav-link').forEach(link => {
+                   link.classList.remove('border-indigo-500', 'text-indigo-700', 'bg-indigo-50');
+                   link.classList.add('border-transparent', 'text-gray-500', 'hover:bg-gray-50', 'hover:border-gray-300', 'hover:text-gray-700');
+               });
+                const mobileLink = document.querySelector(`#mobile-menu a.nav-link[href="${targetHref}"]`);
+                if (mobileLink) {
+                   mobileLink.classList.add('border-indigo-500', 'text-indigo-700', 'bg-indigo-50');
+                   mobileLink.classList.remove('border-transparent', 'text-gray-500', 'hover:bg-gray-50', 'hover:border-gray-300', 'hover:text-gray-700');
+                }
+           }
+
+
+           // --- Stats Animation (Intersection Observer) ---
+           function initializeStatsAnimation() {
+               const statsSection = document.querySelector('.bg-indigo-800');
+               if (!statsSection || typeof IntersectionObserver === 'undefined') {
+                    console.warn("Stats section not found or IntersectionObserver not supported.");
+                   // Fallback for older browsers or if section is missing: just set final numbers immediately
+                   document.querySelectorAll('.bg-indigo-700 .text-4xl[data-target]').forEach(stat => {
+                       const target = parseInt(stat.dataset.target, 10);
+                       if (!isNaN(target)) {
+                           stat.textContent = target.toLocaleString() + (stat.textContent.includes('+') ? '+' : '');
+                       }
+                   });
+                   return;
+               }
+
+
+               const observer = new IntersectionObserver((entries, obs) => {
+               entries.forEach(entry => {
+                   if (entry.isIntersecting) {
+                   animateStatsNumbers();
+                   obs.unobserve(entry.target); // Animate only once
+                   }
+               });
+               }, { threshold: 0.1 }); // Trigger when 10% is visible
+
+               observer.observe(statsSection);
+           }
+
+
+           function animateStatsNumbers() {
+               const stats = document.querySelectorAll('.bg-indigo-700 .text-4xl[data-target]');
+               stats.forEach(stat => {
+               const target = parseInt(stat.dataset.target, 10);
+               if (isNaN(target) || stat.dataset.animated) return; // Skip if not a number or already animated
+               stat.dataset.animated = true; // Mark as animated
+
+               let count = 0;
+               const duration = 1500; // Animation duration in ms
+               const stepTime = Math.max(16, duration / (target || 1)); // ~60fps, adjust step based on target size, avoid division by zero
+                // Calculate increment more dynamically, ensuring it finishes roughly in time
+                const increment = Math.max(1, Math.ceil(target / (duration / 16)));
+
+
+               const updateCount = () => {
+                   count += increment;
+                   if (count < target) {
+                       stat.textContent = Math.min(count, target).toLocaleString() + (stat.textContent.includes('+') ? '+' : '');
+                       requestAnimationFrame(updateCount); // Use rAF for smoother animation
+                   } else {
+                       stat.textContent = target.toLocaleString() + (stat.textContent.includes('+') ? '+' : ''); // Ensure final target is set
+                   }
+               };
+               stat.textContent = '0' + (stat.textContent.includes('+') ? '+' : ''); // Start from 0
+               requestAnimationFrame(updateCount); // Start the animation loop
+               });
+           }
+
+           // --- Hero Section Category Select ---
+           function setupHeroCategorySelect() {
+               heroCategorySelect?.addEventListener('change', (e) => {
+                   const selectedValue = e.target.value;
+                   const trendingListContainer = document.querySelector('#home .space-y-4'); // Target the container holding the static tools
+                    if (!trendingListContainer) return;
+
+                   console.log(`Hero Filter: ${selectedValue}`);
+                    // Assuming static hero tools have a <p> with category text
+                   trendingListContainer.querySelectorAll('.tool-card').forEach(card => {
+                       const categoryParagraph = card.querySelector('p.text-sm.text-gray-500');
+                        const toolCategoryText = categoryParagraph ? categoryParagraph.textContent.trim().toLowerCase() : '';
+                        // Simple matching logic for demonstration - adjust if categories are different
+                       let categoryMatch = false;
+                       if (selectedValue === 'All Categories') {
+                            categoryMatch = true;
+                        } else if (selectedValue === 'Text Generation' && (toolCategoryText.includes('text') || toolCategoryText.includes('reasoning'))) {
+                            categoryMatch = true;
+                        } else if (selectedValue === 'Image Generation' && toolCategoryText.includes('image')) {
+                            categoryMatch = true;
+                        } else if (selectedValue === 'Code Assistants' && toolCategoryText.includes('code')) {
+                            categoryMatch = true;
+                        } else if (selectedValue === 'Audio & Music' && (toolCategoryText.includes('music') || toolCategoryText.includes('audio'))) {
+                            categoryMatch = true;
+                       }
+
+
+                       // Fade effect for non-matching items
+                        card.style.transition = 'opacity 0.3s ease, transform 0.3s ease'; // Add transform transition
+                       if (categoryMatch) {
+                            card.style.opacity = '1';
+                           card.style.transform = 'scale(1)';
+                        } else {
+                            card.style.opacity = '0.5'; // Fade out non-matches
+                           card.style.transform = 'scale(0.98)'; // Slightly shrink non-matches
+                        }
+                   });
+               });
+           }
+
+       }); // --- END DOMContentLoaded ---
+    </script>
+ </body>
+ </html>
