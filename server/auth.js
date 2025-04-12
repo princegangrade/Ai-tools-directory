@@ -8,7 +8,7 @@ const authenticateToken = (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1]; // Extract token after "Bearer "
 
     if (token == null) {
-        console.log('Auth Middleware: No token provided.');
+        // console.log('Auth: No token provided.'); // Less verbose logging
         // No token provided
         return res.status(401).json({ error: 'Unauthorized: Access token is required.' });
     }
@@ -16,7 +16,7 @@ const authenticateToken = (req, res, next) => {
     // Verify the token
     jwt.verify(token, JWT_SECRET, (err, decodedPayload) => {
         if (err) {
-            console.log('Auth Middleware: Token verification failed.', err.message);
+            // console.log('Auth: Token verification failed.', err.message); // Less verbose logging
              // Token is invalid (expired, wrong secret, etc.)
              if (err.name === 'TokenExpiredError') {
                  return res.status(401).json({ error: 'Unauthorized: Token has expired.' });
@@ -25,9 +25,8 @@ const authenticateToken = (req, res, next) => {
         }
 
         // Token is valid, attach decoded payload (user info) to the request object
-        // We stored { userId: ..., email: ... } in the payload during login
         req.user = decodedPayload;
-        console.log('Auth Middleware: Token verified for user ID:', req.user.userId);
+        // console.log('Auth: Token verified for user ID:', req.user.userId); // Less verbose logging
 
         // Proceed to the next middleware or the route handler
         next();
