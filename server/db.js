@@ -3,18 +3,6 @@
 
 const { Pool } = require('pg'); // Use the pg Pool
 
-// --- TEMPORARY DEBUGGING ---
-// Log environment variables right before creating the Pool
-console.log('--- Creating Pool ---');
-console.log('User read as:', process.env.DB_USER);
-console.log('Host read as:', process.env.DB_HOST);
-console.log('Database read as:', process.env.DB_DATABASE);
-// Avoid logging the actual password, just check if it seems to exist
-console.log('Password read as:', process.env.DB_PASSWORD ? '****** (Exists)' : 'MISSING or BLANK');
-console.log('Port read as:', process.env.DB_PORT);
-console.log('---------------------');
-// ---- END DEBUGGING ----
-
 // Create the Pool using environment variables
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -32,7 +20,6 @@ const pool = new Pool({
 pool.connect((err, client, release) => {
   if (err) {
     // Log a more informative error if connection fails
-    // It will use the (potentially undefined) process.env values again here in the error message
     return console.error(`Error connecting to PostgreSQL database "${process.env.DB_DATABASE}" as user "${process.env.DB_USER}" on host "${process.env.DB_HOST}:${process.env.DB_PORT}":`, err.stack);
   }
   if(client) {
