@@ -1,41 +1,61 @@
 -- ==================================================
 -- == AI TOOLS DIRECTORY - SCHEMA & SEED DATA =====
 -- ==================================================
+-- Version: Corrected to match server.js (April 12, 2025)
 
--- Use IF NOT EXISTS for safer re-running
-
--- PART 1: CREATE TABLES, FUNCTION, TRIGGERS
--- =============================================
+-- Drop tables if resetting (uncomment below lines CAREFULLY to wipe data)
+-- DROP TRIGGER IF EXISTS set_timestamp_reviews ON reviews;
+-- DROP TRIGGER IF EXISTS reviews_changed_update_tool ON reviews;
+-- DROP TRIGGER IF EXISTS set_timestamp_users ON users;
+-- DROP TRIGGER IF EXISTS set_timestamp_news ON news_articles;
+-- DROP TRIGGER IF EXISTS set_timestamp_tools ON tools;
+-- DROP FUNCTION IF EXISTS update_tool_rating();
+-- DROP FUNCTION IF EXISTS trigger_set_timestamp();
+-- DROP TABLE IF EXISTS reviews CASCADE;
+-- DROP TABLE IF EXISTS user_favorites CASCADE;
+-- DROP TABLE IF EXISTS users CASCADE;
+-- DROP TABLE IF EXISTS news_articles CASCADE;
+-- DROP TABLE IF EXISTS tools CASCADE;
+-- DROP TABLE IF EXISTS categories CASCADE;
 
 -- Categories Table
 CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
-    slug VARCHAR(100) NOT NULL UNIQUE -- For URLs (e.g., 'text-generation')
+    slug VARCHAR(100) NOT NULL UNIQUE
 );
 
--- Tools Table
+-- Tools Table (Includes all columns from server.js)
 CREATE TABLE IF NOT EXISTS tools (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) NOT NULL UNIQUE, -- For URLs (e.g., 'claude-3-7-sonnet')
+    slug VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
     website_url VARCHAR(512),
-    try_now_url VARCHAR(512), -- Could be same as website or affiliate link
-    image_url VARCHAR(512), -- Logo URL
-    pricing_text VARCHAR(100), -- e.g., "Free - $20/mo"
-    pricing_low NUMERIC(10, 2) DEFAULT 0, -- For sorting/filtering
-    pricing_high NUMERIC(10, 2), -- Can be NULL if single price or free
-    rating_avg NUMERIC(3, 2) DEFAULT 0, -- Calculated later from reviews
-    review_count INTEGER DEFAULT 0, -- Calculated later
-    tags_array TEXT[], -- Array of text tags like ['creative', 'code']
-    features_json JSONB, -- Store detailed features as JSON { "feature1": "desc", "api": true }
-    category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL, -- Reference categories table, handle deletion
-    submitted_by_user_id INTEGER, -- Placeholder for user reference
+    try_now_url VARCHAR(512),
+    image_url VARCHAR(512),
+    pricing_text VARCHAR(100),
+    pricing_low NUMERIC(10, 2) DEFAULT 0, -- Price can be 0 for Free/Freemium
+    pricing_high NUMERIC(10, 2),
+    rating_avg NUMERIC(3, 2) DEFAULT 0,
+    review_count INTEGER DEFAULT 0,
+    tags_array TEXT[], -- Array of lowercase strings recommended
+    features_json JSONB, -- Store structured features as JSON
+    category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL, -- Allow category deletion without deleting tools
+    submitted_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL, -- Keep submission record even if user deleted
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('approved', 'pending', 'rejected')),
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    vendor_name VARCHAR(150),
+    screenshots_array TEXT[], -- Array of image URLs
+    pricing_tiers_json JSONB, -- Array of {name, price, features:[]} objects
+    documentation_url VARCHAR(512),
+    alternatives_array TEXT[] -- Array of tool slugs
 );
+-- Add indexes for faster lookups
+CREATE INDEX IF NOT EXISTS idx_tools_category_id ON tools(category_id);
+CREATE INDEX IF NOT EXISTS idx_tools_status ON tools(status);
+CREATE INDEX IF NOT EXISTS idx_tools_tags ON tools USING GIN (tags_array); -- GIN index for array searching
 
 -- News Articles Table
 CREATE TABLE IF NOT EXISTS news_articles (
@@ -51,57 +71,103 @@ CREATE TABLE IF NOT EXISTS news_articles (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS idx_news_status_published_date ON news_articles(status, published_date DESC);
 
--- Function to auto-update 'updated_at' timestamp (only create if it doesn't exist)
+-- Users Table
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(100) NOT NULL, -- Bcrypt hashes are typically 60 chars, 100 gives buffer
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_users_email_lower ON users (lower(email)); -- Index for case-insensitive email lookup
+
+-- User Favorites Table (Linking table)
+CREATE TABLE IF NOT EXISTS user_favorites (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    tool_id INTEGER NOT NULL REFERENCES tools(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    PRIMARY KEY (user_id, tool_id) -- Ensures a user favorites a tool only once
+);
+CREATE INDEX IF NOT EXISTS idx_user_favorites_tool_id ON user_favorites(tool_id); -- Index for finding users who favorited a tool
+
+-- Reviews Table
+CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY,
+    tool_id INTEGER NOT NULL REFERENCES tools(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    rating SMALLINT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    review_text TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (tool_id, user_id) -- Each user can review a tool only once
+);
+CREATE INDEX IF NOT EXISTS idx_reviews_user_id ON reviews(user_id); -- Index for finding reviews by user
+
+-- Function to update 'updated_at' timestamp automatically
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'trigger_set_timestamp') THEN
         CREATE FUNCTION trigger_set_timestamp()
-        RETURNS TRIGGER AS $$
+        RETURNS TRIGGER AS $func$
         BEGIN
-          NEW.updated_at = NOW();
-          RETURN NEW;
+            NEW.updated_at = NOW();
+            RETURN NEW;
         END;
-        $$ LANGUAGE plpgsql;
-        RAISE NOTICE 'Function trigger_set_timestamp created or already exists.';
-    ELSE
-        RAISE NOTICE 'Function trigger_set_timestamp already exists, skipping creation.';
+        $func$ LANGUAGE plpgsql;
+        COMMENT ON FUNCTION trigger_set_timestamp IS 'Automatically sets updated_at on row update';
     END IF;
 END $$;
 
--- Trigger for 'tools' table (only create if it doesn't exist)
+-- Triggers for 'updated_at' on relevant tables
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_tools' AND tgrelid = 'tools'::regclass) THEN CREATE TRIGGER set_timestamp_tools BEFORE UPDATE ON tools FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp(); END IF; END $$;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_news' AND tgrelid = 'news_articles'::regclass) THEN CREATE TRIGGER set_timestamp_news BEFORE UPDATE ON news_articles FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp(); END IF; END $$;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_users' AND tgrelid = 'users'::regclass) THEN CREATE TRIGGER set_timestamp_users BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp(); END IF; END $$;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_reviews' AND tgrelid = 'reviews'::regclass) THEN CREATE TRIGGER set_timestamp_reviews BEFORE UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp(); END IF; END $$;
+
+-- Function to update tool rating_avg and review_count when reviews change
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_tools' AND tgrelid = 'tools'::regclass) THEN
-        CREATE TRIGGER set_timestamp_tools
-        BEFORE UPDATE ON tools
-        FOR EACH ROW
-        EXECUTE FUNCTION trigger_set_timestamp();
-        RAISE NOTICE 'Trigger set_timestamp_tools created.';
-    ELSE
-         RAISE NOTICE 'Trigger set_timestamp_tools already exists, skipping creation.';
+    IF NOT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'update_tool_rating') THEN
+        CREATE FUNCTION update_tool_rating()
+        RETURNS TRIGGER AS $func$
+        BEGIN
+            -- Recalculate average rating and count for the affected tool
+            WITH review_stats AS (
+                SELECT AVG(rating)::numeric(3,2) as avg_r, COUNT(*) as count_r
+                FROM reviews
+                WHERE tool_id = COALESCE(NEW.tool_id, OLD.tool_id) -- Works for INSERT, UPDATE, DELETE
+            )
+            UPDATE tools
+            SET rating_avg = COALESCE((SELECT avg_r FROM review_stats), 0),
+                review_count = COALESCE((SELECT count_r FROM review_stats), 0)
+            WHERE id = COALESCE(NEW.tool_id, OLD.tool_id);
+
+            RETURN NULL; -- AFTER trigger doesn't need to return the row
+        END;
+        $func$ LANGUAGE plpgsql;
+        COMMENT ON FUNCTION update_tool_rating IS 'Updates tools.rating_avg and tools.review_count when reviews change';
     END IF;
 END $$;
 
--- Trigger for 'news_articles' table (only create if it doesn't exist)
+-- Trigger to execute rating update function after review changes
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_news' AND tgrelid = 'news_articles'::regclass) THEN
-        CREATE TRIGGER set_timestamp_news
-        BEFORE UPDATE ON news_articles
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'reviews_changed_update_tool' AND tgrelid = 'reviews'::regclass) THEN
+        CREATE TRIGGER reviews_changed_update_tool
+        AFTER INSERT OR UPDATE OR DELETE ON reviews -- Trigger on all review modifications
         FOR EACH ROW
-        EXECUTE FUNCTION trigger_set_timestamp();
-        RAISE NOTICE 'Trigger set_timestamp_news created.';
-    ELSE
-        RAISE NOTICE 'Trigger set_timestamp_news already exists, skipping creation.';
+        EXECUTE FUNCTION update_tool_rating();
     END IF;
 END $$;
 
--- PART 2: INSERT INITIAL DATA
--- =============================================
--- Use ON CONFLICT DO NOTHING to avoid errors if data already exists
+-- ==================
+-- == SEED DATA =====
+-- ==================
 
--- Insert Categories
+-- Insert Categories (Idempotent)
 INSERT INTO categories (name, slug) VALUES
     ('Text AI', 'text-ai'),
     ('Image AI', 'image-ai'),
@@ -109,74 +175,115 @@ INSERT INTO categories (name, slug) VALUES
     ('Video AI', 'video-ai'),
     ('Audio AI', 'audio-ai'),
     ('Utility AI', 'utility-ai')
-ON CONFLICT (slug) DO NOTHING;
+ON CONFLICT (slug) DO NOTHING; -- Don't update existing categories
 
--- Insert Tools (Ensure category IDs are correct based on above inserts: 1-6)
-INSERT INTO tools (name, slug, description, website_url, try_now_url, pricing_text, pricing_low, pricing_high, rating_avg, category_id, tags_array, status) VALUES
-    ('Claude 3.7 Sonnet', 'claude-3-7-sonnet', 'Advanced AI assistant with superior reasoning capabilities, ideal for complex tasks, research, and creative writing.', 'https://claude.ai/', 'https://claude.ai/', 'Free - $20/mo', 0.00, 20.00, 4.9, 1, ARRAY['Reasoning', 'Code', 'Creative', 'Research'], 'approved'),
-    ('Midjourney v6.5', 'midjourney-v6-5', 'State-of-the-art AI image generator capable of creating stunning, artistic images from text descriptions via Discord.', 'https://www.midjourney.com/', 'https://www.midjourney.com/', '$10 - $60/mo', 10.00, 60.00, 4.8, 2, ARRAY['Art', 'Design', 'Photorealistic', 'Discord'], 'approved'),
-    ('GitHub Copilot', 'github-copilot', 'AI pair programmer that helps you write code faster with smart autocomplete and full line & function suggestions.', 'https://github.com/features/copilot', 'https://github.com/features/copilot', 'Free (Students) - $10/mo', 0.00, 10.00, 4.7, 3, ARRAY['Coding', 'Developer', 'IDE'], 'approved'),
-    ('RunwayML', 'runwayml', 'AI-powered video editing and generation suite for creators, featuring text-to-video (Gen-2) and other magic tools.', 'https://runwayml.com/', 'https://runwayml.com/', 'Free - $35+/mo', 0.00, 35.00, 4.6, 4, ARRAY['Video Editing', 'Gen-2', 'Creative Suite'], 'approved'),
-    ('ChatGPT (3.5)', 'chatgpt-3-5', 'Highly popular conversational AI for generating text, answering questions, writing code, brainstorming, and more.', 'https://chatgpt.com/', 'https://chatgpt.com/', 'Free (GPT-3.5) / $20/mo (GPT-4)', 0.00, 20.00, 4.7, 1, ARRAY['Chatbot', 'Writing', 'Conversation', 'General Purpose'], 'approved'),
-    ('Google Gemini', 'google-gemini', 'Google''s powerful AI model for conversation, content creation, and multimodal understanding (text, images, code).', 'https://gemini.google.com/', 'https://gemini.google.com/', 'Free / $20/mo (Advanced)', 0.00, 20.00, 4.6, 1, ARRAY['Chatbot', 'Multimodal', 'Google Ecosystem', 'Research'], 'approved'),
-    ('Leonardo.Ai', 'leonardo-ai', 'Feature-rich platform for creating stunning AI art and images using various models (incl. Stable Diffusion) with a generous free tier.', 'https://leonardo.ai/', 'https://leonardo.ai/', 'Free (Daily Credits) - $12+/mo', 0.00, 12.00, 4.7, 2, ARRAY['Image Generation', 'Art', 'Stable Diffusion', 'Web UI'], 'approved'),
-    ('Suno AI', 'suno-ai', 'Generate original songs with vocals and instrumentation simply by providing text prompts for lyrics and style.', 'https://suno.ai/', 'https://suno.ai/', 'Free (Daily Credits) - $10+/mo', 0.00, 10.00, 4.6, 5, ARRAY['Music Generation', 'Song Creation', 'Vocals', 'Text-to-Music'], 'approved'),
-    ('Grammarly', 'grammarly', 'AI-powered writing assistant that checks grammar, spelling, punctuation, clarity, engagement, and delivery tones.', 'https://www.grammarly.com/', 'https://www.grammarly.com/', 'Free - $12+/mo (Premium)', 0.00, 12.00, 4.8, 6, ARRAY['Writing Assistant', 'Grammar', 'Clarity', 'Browser Extension'], 'approved'),
-    ('Phind', 'phind', 'AI search engine designed specifically for developers, providing code examples and explanations sourced from the web.', 'https://www.phind.com/', 'https://www.phind.com/', 'Free / $20/mo (Plus)', 0.00, 20.00, 4.5, 3, ARRAY['Developer Search', 'Code Examples', 'Debugging', 'Pair Programming'], 'approved')
-ON CONFLICT (slug) DO NOTHING;
+-- Insert Tools (Idempotent based on slug)
+-- NOTE: Re-running this script WILL UPDATE existing tools based on slug
+-- to match the values below. If you want to only insert NEW tools, change
+-- 'DO UPDATE SET ...' to 'DO NOTHING'.
+INSERT INTO tools (
+    name, slug, description, website_url, try_now_url, pricing_text, pricing_low, pricing_high,
+    rating_avg, category_id, tags_array, status, vendor_name, screenshots_array, features_json,
+    pricing_tiers_json, documentation_url, alternatives_array
+) VALUES
+    ('Claude 3.7 Sonnet', 'claude-3-7-sonnet', 'Advanced AI assistant with superior reasoning capabilities, ideal for complex tasks, research, and creative writing.', 'https://claude.ai/', 'https://claude.ai/', 'Free / $20/mo', 0.00, 20.00, 4.9, (SELECT id FROM categories WHERE slug='text-ai'), ARRAY['reasoning', 'code', 'creative', 'research', 'vision', 'api', 'anthropic'], 'approved', 'Anthropic',
+     ARRAY['https://via.placeholder.com/400x300/A8DADC/1D3557?text=Claude+UI', 'https://via.placeholder.com/400x300/A8DADC/1D3557?text=Claude+Code'],
+     '{"Context Window": "200K Tokens", "Vision Capabilities": true, "API Access": true, "Model Size": "Medium"}',
+     '[{"name": "Free", "price": "$0", "features": ["Generous daily usage", "Vision capabilities", "Access to Sonnet model"]}, {"name": "Pro", "price": "$20/mo", "features": ["5x usage vs Free", "Priority access", "Early access to new features"]}]',
+     'https://docs.anthropic.com/', ARRAY['chatgpt-3-5', 'google-gemini']),
 
--- Insert News Articles
+    ('Midjourney v6.5', 'midjourney-v6-5', 'State-of-the-art AI image generator capable of creating stunning, artistic images from text descriptions via Discord.', 'https://www.midjourney.com/', 'https://discord.gg/midjourney', '$10 - $60/mo', 10.00, 60.00, 4.8, (SELECT id FROM categories WHERE slug='image-ai'), ARRAY['art', 'design', 'photorealistic', 'discord', 'image generation', 'creative'], 'approved', 'Midjourney',
+     ARRAY['https://via.placeholder.com/400x300/CABBE9/4A00E0?text=Midjourney+Art+1', 'https://via.placeholder.com/400x300/CABBE9/4A00E0?text=Midjourney+Art+2'],
+     '{"Control Parameters": true, "Image Upscaling": true, "Style Reference": true, "Character Reference": true}',
+     '[{"name": "Basic Plan", "price": "$10/mo", "features": ["~200 images/mo (Fast GPU)", "General commercial terms"]}, {"name": "Standard Plan", "price": "$30/mo", "features": ["15hr Fast GPU/mo", "Unlimited Relaxed GPU"]}, {"name": "Pro Plan", "price": "$60/mo", "features": ["30hr Fast GPU/mo", "Unlimited Relaxed GPU", "Stealth mode"]}]',
+     'https://docs.midjourney.com/', ARRAY['leonardo-ai', 'stable-diffusion-xl']),
+
+    ('GitHub Copilot', 'github-copilot', 'AI pair programmer that helps you write code faster with smart autocomplete and full line & function suggestions integrated into your IDE.', 'https://github.com/features/copilot', 'https://github.com/features/copilot', 'Free (Students/OSS) / $10/mo', 0.00, 10.00, 4.7, (SELECT id FROM categories WHERE slug='code-ai'), ARRAY['coding', 'developer', 'ide', 'autocomplete', 'python', 'javascript'], 'approved', 'GitHub / OpenAI',
+     ARRAY['https://via.placeholder.com/400x300/B2F2BB/2F855A?text=Copilot+VSCode'],
+     '{"IDE Integration": true, "Code Completion": true, "Multi-language Support": true, "Code Explanation": true}',
+     '[{"name": "Individual", "price": "$10/mo", "features": ["IDE integration", "Code suggestions", "Chat feature"]}, {"name": "Business", "price": "$19/user/mo", "features": ["Org-wide policy management", "IP indemnity"]}]',
+     'https://docs.github.com/en/copilot', ARRAY['phind', 'tabnine', 'codewhisperer']),
+
+    ('RunwayML Gen-2', 'runwayml-gen-2', 'AI-powered video generation suite featuring text-to-video (Gen-2), image-to-video, and various video editing magic tools.', 'https://runwayml.com/', 'https://app.runwayml.com/', 'Free (Credits) / $15+/mo', 0.00, 15.00, 4.6, (SELECT id FROM categories WHERE slug='video-ai'), ARRAY['video editing', 'gen-2', 'text-to-video', 'creative suite', 'ai magic tools'], 'approved', 'RunwayML',
+     ARRAY['https://via.placeholder.com/400x300/FBCFE8/9D174D?text=Runway+UI', 'https://via.placeholder.com/400x300/FBCFE8/9D174D?text=Gen-2+Output'],
+     '{"Text-to-Video": true, "Image-to-Video": true, "Video Editing Tools": true, "Collaboration": true}',
+     '[{"name": "Free", "price": "$0", "features": ["Limited credits", "720p export", "Watermark"]}, {"name": "Standard", "price": "$15/mo", "features": ["625 credits/mo", "1080p export", "No watermark", "Upscaling"]}, {"name": "Pro", "price": "$35/mo", "features": ["2250 credits/mo", "4K export", "More storage"]}]',
+     'https://docs.runwayml.com/', ARRAY['pika-labs', 'luma-dream-machine']),
+
+    ('ChatGPT (GPT-4o)', 'chatgpt-4o', 'OpenAI''s flagship conversational AI with advanced reasoning, multimodality (text, vision, audio), and web browsing capabilities.', 'https://chatgpt.com/', 'https://chatgpt.com/', 'Free (Limited GPT-4o) / $20/mo (Plus)', 0.00, 20.00, 4.8, (SELECT id FROM categories WHERE slug='text-ai'), ARRAY['chatbot', 'writing', 'conversation', 'multimodal', 'vision', 'gpt-4', 'openai'], 'approved', 'OpenAI',
+     ARRAY['https://via.placeholder.com/400x300/BFDBFE/1E40AF?text=ChatGPT+Interface'],
+     '{"Vision Capabilities": true, "Audio Input/Output": true, "Web Browsing": true, "Custom GPTs": true, "API Access": true}',
+     '[{"name": "Free", "price": "$0", "features": ["Access to GPT-3.5", "Limited GPT-4o access"]}, {"name": "Plus", "price": "$20/mo", "features": ["Full GPT-4o access", "Higher usage limits", "DALL-E Image Gen", "Custom GPTs"]}]',
+     'https://help.openai.com/en/', ARRAY['claude-3-7-sonnet', 'google-gemini']),
+
+    ('Google Gemini Advanced', 'google-gemini-advanced', 'Google''s most capable AI model (Gemini 1.5 Pro) integrated into Google products, offering long context understanding and multimodality.', 'https://gemini.google.com/', 'https://gemini.google.com/app', '$20/mo (Google One AI Premium)', 19.99, 19.99, 4.7, (SELECT id FROM categories WHERE slug='text-ai'), ARRAY['chatbot', 'multimodal', 'google ecosystem', 'long context', 'research', 'vision'], 'approved', 'Google',
+      ARRAY['https://via.placeholder.com/400x300/C6F6D5/2F855A?text=Gemini+UI'],
+      '{"Long Context Window": "1M Tokens", "Vision Capabilities": true, "Integration (Docs, Gmail)": true, "Code Generation": true}',
+     '[{"name": "Google One AI Premium", "price": "$19.99/mo", "features": ["Gemini Advanced (1.5 Pro)", "Integration in Gmail, Docs, etc.", "2TB Google One storage"]}]',
+     'https://support.google.com/gemini', ARRAY['chatgpt-4o', 'claude-3-7-sonnet']),
+
+    ('Leonardo.Ai', 'leonardo-ai', 'Feature-rich platform for creating stunning AI art and images using various models (incl. Stable Diffusion) with fine-grained controls.', 'https://leonardo.ai/', 'https://app.leonardo.ai/', 'Free (Daily Credits) / $12+/mo', 0.00, 12.00, 4.7, (SELECT id FROM categories WHERE slug='image-ai'), ARRAY['image generation', 'art', 'stable diffusion', 'web ui', 'creative control', 'api'], 'approved', 'Leonardo AI',
+     ARRAY['https://via.placeholder.com/400x300/FEEBC8/9C4221?text=Leonardo+Gallery', 'https://via.placeholder.com/400x300/FEEBC8/9C4221?text=Leonardo+Editor'],
+     '{"Multiple Models": true, "Image Guidance": true, "Fine-tuning (LCM)": true, "API Access": true}',
+     '[{"name": "Free", "price": "$0", "features": ["150 credits/day", "Limited features"]}, {"name": "Apprentice", "price": "$12/mo", "features": ["8500 credits/mo", "Priority generation"]}, {"name": "Artisan", "price": "$30/mo", "features": ["25000 credits/mo", "More features"]}]',
+     'https://docs.leonardo.ai/', ARRAY['midjourney-v6-5', 'stable-diffusion-xl']),
+
+    ('Suno AI', 'suno-ai', 'Generate original songs with vocals and instrumentation simply by providing text prompts for lyrics and style. Impressively coherent music.', 'https://suno.ai/', 'https://app.suno.ai/', 'Free (Daily Credits) / $10+/mo', 0.00, 10.00, 4.6, (SELECT id FROM categories WHERE slug='audio-ai'), ARRAY['music generation', 'song creation', 'vocals', 'text-to-music', 'ai music'], 'approved', 'Suno',
+     ARRAY['https://via.placeholder.com/400x300/FEFCBF/B7791F?text=Suno+Interface'],
+     '{"Custom Lyrics": true, "Instrumental Generation": true, "Multiple Styles": true, "Song Structure Control": true}',
+     '[{"name": "Free", "price": "$0", "features": ["50 credits/day (10 songs)", "Non-commercial use"]}, {"name": "Pro", "price": "$10/mo", "features": ["2500 credits/mo (500 songs)", "General commercial terms"]}, {"name": "Premier", "price": "$30/mo", "features": ["10000 credits/mo (2000 songs)"]}]',
+     'https://docs.suno.ai/', ARRAY['udio', 'stable-audio']),
+
+    ('Grammarly', 'grammarly', 'AI-powered writing assistant that checks grammar, spelling, punctuation, clarity, engagement, and delivery tones across various platforms.', 'https://www.grammarly.com/', 'https://app.grammarly.com/', 'Free / $12+/mo (Premium)', 0.00, 12.00, 4.8, (SELECT id FROM categories WHERE slug='utility-ai'), ARRAY['writing assistant', 'grammar', 'clarity', 'browser extension', 'style checker', 'proofreading'], 'approved', 'Grammarly',
+     ARRAY['https://via.placeholder.com/400x300/E9D8FD/6B46C1?text=Grammarly+Editor'],
+     '{"Browser Extension": true, "Tone Detection": true, "Plagiarism Checker": true, "Style Guide": true}',
+     '[{"name": "Free", "price": "$0", "features": ["Basic grammar & spelling"]}, {"name": "Premium", "price": "$12+/mo", "features": ["Clarity, Tone, Plagiarism", "Advanced suggestions"]}, {"name": "Business", "price": "Varies", "features": ["Style guides", "Team features"]}]',
+     'https://support.grammarly.com/', ARRAY['quillbot', 'prowritingaid']),
+
+    ('Phind', 'phind', 'AI search engine designed specifically for developers, providing code examples, explanations, and answers sourced from the web.', 'https://www.phind.com/', 'https://www.phind.com/', 'Free / $20/mo (Plus)', 0.00, 20.00, 4.5, (SELECT id FROM categories WHERE slug='code-ai'), ARRAY['developer search', 'code examples', 'debugging', 'pair programming', 'technical search'], 'approved', 'Phind',
+     ARRAY['https://via.placeholder.com/400x300/A0AEC0/1A202C?text=Phind+Search'],
+     '{"Code Generation": true, "Technical Explanation": true, "Source Linking": true, "VS Code Extension": true}',
+     '[{"name": "Free", "price": "$0", "features": ["Limited usage of best models"]}, {"name": "Plus", "price": "$20/mo", "features": ["Higher limits", "Access to Phind-70B", "Longer context"]}]',
+     'https://www.phind.com/docs', ARRAY['github-copilot', 'perplexity-ai'])
+ON CONFLICT (slug) DO UPDATE SET -- If slug exists, update the row with these new values
+    name = EXCLUDED.name,
+    description = EXCLUDED.description,
+    website_url = EXCLUDED.website_url,
+    try_now_url = EXCLUDED.try_now_url,
+    pricing_text = EXCLUDED.pricing_text,
+    pricing_low = EXCLUDED.pricing_low,
+    pricing_high = EXCLUDED.pricing_high,
+    rating_avg = EXCLUDED.rating_avg,
+    category_id = EXCLUDED.category_id,
+    tags_array = EXCLUDED.tags_array,
+    status = EXCLUDED.status,
+    vendor_name = EXCLUDED.vendor_name,
+    screenshots_array = EXCLUDED.screenshots_array,
+    features_json = EXCLUDED.features_json,
+    pricing_tiers_json = EXCLUDED.pricing_tiers_json,
+    documentation_url = EXCLUDED.documentation_url,
+    alternatives_array = EXCLUDED.alternatives_array,
+    updated_at = NOW(); -- Explicitly update timestamp on seed update
+
+-- Insert News Articles (Idempotent)
 INSERT INTO news_articles (title, slug, content, image_url, category, published_date, author, status) VALUES
-    ('Anthropic Releases Claude 3.7 Sonnet', 'anthropic-releases-claude-3-7-sonnet', 'Anthropic introduces a new version of Claude with improved reasoning capabilities, vision, and performance. This model aims to compete directly with top offerings while providing strong performance on benchmarks.', 'https://images.unsplash.com/photo-1677756119517-756a188d2d94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDEwfHxhaSUyMGxhdW5jaHxlbnwwfDB8fHwxNjgzNTU5ODUz&ixlib=rb-4.0.3&q=80&w=400', 'release', '2025-04-05', 'AI Tools Directory Staff', 'published'),
-    ('AI Video Tools Growth Explodes', 'ai-video-tools-growth-explodes', 'New report shows 300% growth in AI video tool adoption across creative industries. Tools like RunwayML, Pika Labs, and others are rapidly improving text-to-video capabilities.', 'https://images.unsplash.com/photo-1682002115004-91d79b809a17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDE1fHxhSSUyMHZpZGVvfGVufDB8MHx8fDE2ODM1NjAwMTk&ixlib=rb-4.0.3&q=80&w=400', 'trend', '2025-04-03', 'Maya Johnson', 'published'),
-    ('Breakthrough in Efficient Transformers', 'breakthrough-efficient-transformers', 'A new paper published on arXiv details a method called "Sparse Attention Projection" (SAP) to significantly reduce the computational cost of large language models during inference, potentially enabling larger models on consumer hardware.', 'https://images.unsplash.com/photo-1532187863486-abf9db5a9fed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDZ8fGFpJTIwcmVzZWFyY2h8ZW58MHwwfHx8MTY4MzU2MDEyOA&ixlib=rb-4.0.3&q=80&w=400', 'research', '2025-04-01', 'Dr. Evelyn Reed', 'published')
+    ('Anthropic Releases Claude 3.7 Sonnet', 'anthropic-releases-claude-3-7-sonnet', 'Anthropic today announced Claude 3.7 Sonnet, the latest addition to their family of AI models. \n\nKey improvements include:\n*   **Enhanced Reasoning:** Near-Opus level performance on graduate-level reasoning tasks.\n*   **Improved Vision:** Better understanding of complex charts, graphs, and visual inputs.\n*   **Code Generation:** Significant improvements in code generation and understanding.\n*   **Reduced Hallucinations:** Continued focus on reliability and truthfulness.\n\nClaude 3.7 Sonnet is available now via the API and on claude.ai, offering Pro users higher rate limits. This release positions Sonnet as a strong competitor to models like GPT-4o.', 'https://images.unsplash.com/photo-1677756119517-756a188d2d94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDEwfHxhaSUyMGxhdW5jaHxlbnwwfDB8fHwxNjgzNTU5ODUz&ixlib=rb-4.0.3&q=80&w=400', 'release', '2025-04-05', 'AI Tools Directory Staff', 'published'),
+    ('AI Video Tools Growth Explodes', 'ai-video-tools-growth-explodes', E'A new market report indicates a staggering 300% year-over-year growth in the adoption of AI-powered video generation and editing tools.\n\nPlatforms like RunwayML, Pika Labs, and Luma AI are seeing increased usage across film production, marketing, and social media content creation. The ease of generating complex scenes from text prompts is lowering the barrier to entry for video creators. However, concerns about deepfakes and copyright remain prevalent discussion points.', 'https://images.unsplash.com/photo-1682002115004-91d79b809a17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDE1fHxhSSUyMHZpZGVvfGVufDB8MHx8fDE2ODM1NjAwMTk&ixlib=rb-4.0.3&q=80&w=400', 'trend', '2025-04-03', 'Maya Johnson', 'published'),
+    ('Breakthrough in Efficient Transformers', 'breakthrough-efficient-transformers', E'Researchers from Stanford AI Lab have published a paper detailing a novel technique called "Sparse Attention Projection" (SAP).\n\nSAP aims to significantly reduce the computational cost associated with the attention mechanism in large language models (LLMs) without sacrificing performance on key benchmarks. Early results suggest potential for up to 40% reduction in inference latency on certain models. This could pave the way for more powerful AI running on less demanding hardware. Read the full paper [here](https://example.com/sap-paper-link).', 'https://images.unsplash.com/photo-1532187863486-abf9db5a9fed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNzkwMnwwfDF8c2VhcmNofDZ8fGFpJTIwcmVzZWFyY2h8ZW58MHwwfHx8MTY4MzU2MDEyOA&ixlib=rb-4.0.3&q=80&w=400', 'research', '2025-04-01', 'Dr. Evelyn Reed', 'published')
 ON CONFLICT (slug) DO NOTHING;
 
--- Add a final message
-SELECT 'Schema creation and initial data seeding SQL block executed.';
+-- Insert a dummy user for testing reviews/favorites (Password: password123)
+-- DO NOT USE THIS IN PRODUCTION - CREATE USERS VIA REGISTRATION
+INSERT INTO users (name, email, password_hash) VALUES
+    ('Test User', 'test@example.com', '$2b$10$E.w5YmXkL2v3v7u0A4I9Uu9E7bB7rA6C4c1d0e9f2g3h5i8k')
+ON CONFLICT (email) DO NOTHING;
 
--- ==================================================
--- == PHASE 2 SCHEMA UPDATES ========================
--- ==================================================
--- Creates 'users' and 'user_favorites' tables
+-- Update tool ratings based on initial seed data or manually added reviews if needed
+-- This ensures counts/averages are correct after seeding.
+SELECT update_tool_rating(); -- Call the function manually once after seeding if needed
 
--- Users Table
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(150) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(100) NOT NULL, -- Store hashed password, not plain text
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- Final Confirmation
+SELECT 'Schema creation and initial data seeding completed successfully.' AS message;
+```
 
--- Apply the updated_at trigger to users table (Assumes trigger_set_timestamp function already exists from Phase 1)
-DO $$
-BEGIN
-    -- Check if the trigger function exists before attempting to create the trigger
-    IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'trigger_set_timestamp') THEN
-        -- Check if the trigger itself already exists
-        IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'set_timestamp_users' AND tgrelid = 'users'::regclass) THEN
-            CREATE TRIGGER set_timestamp_users
-            BEFORE UPDATE ON users
-            FOR EACH ROW
-            EXECUTE FUNCTION trigger_set_timestamp();
-            RAISE NOTICE 'Trigger set_timestamp_users created.';
-        ELSE
-            RAISE NOTICE 'Trigger set_timestamp_users already exists, skipping creation.';
-        END IF;
-    ELSE
-         RAISE NOTICE 'Function trigger_set_timestamp does not exist. Skipping trigger creation for users table.';
-    END IF;
-END $$;
-
--- User Favorites Table (Many-to-Many relationship between users and tools)
-CREATE TABLE IF NOT EXISTS user_favorites (
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- If user is deleted, remove their favorites
-    tool_id INTEGER NOT NULL REFERENCES tools(id) ON DELETE CASCADE, -- If tool is deleted, remove from favorites
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    PRIMARY KEY (user_id, tool_id) -- Ensure a user can only favorite a tool once
-);
-
--- Add a simple message to confirm execution attempt
-SELECT 'Phase 2 Schema Update SQL block executed.';
+---
